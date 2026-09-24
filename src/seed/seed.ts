@@ -31,10 +31,10 @@ const seedData = async () => {
     // 1. Create Users
     console.log('[Seed] Creating demo users...');
     const admin = await User.create({
-      firstName: 'Alexander',
-      lastName: 'Pierce',
+      firstName: 'Alaguraj',
+      lastName: 'Admin',
       email: 'admin@ecommerce.com',
-      phone: '+91 98765 43210',
+      phone: '+91 93619 23406',
       password: 'Admin@123456',
       role: 'admin',
       isEmailVerified: true,
@@ -42,337 +42,211 @@ const seedData = async () => {
     });
 
     const customer = await User.create({
-      firstName: 'Sophia',
-      lastName: 'Chen',
+      firstName: 'Preethi',
+      lastName: 'Sundaram',
       email: 'customer@ecommerce.com',
-      phone: '+91 91234 56789',
+      phone: '+91 99525 37388',
       password: 'Customer@123456',
       role: 'customer',
       isEmailVerified: true,
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
     });
 
-    // 2. Create Categories
+    // 2. Create Categories (Matching Sculpted.in)
     console.log('[Seed] Creating categories...');
     const categories = await Category.create([
       {
-        name: "Men's Fashion",
-        slug: 'mens-fashion',
-        description: 'Refined contemporary apparel tailored for modern living.',
-        image: 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
+        name: 'Lehenga & Half Saree',
+        slug: 'lehenga-half-saree',
+        description: 'Handcrafted bridal and occasion lehengas, pure zari half sarees, and bespoke flared sets.',
+        image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
         isActive: true,
       },
       {
-        name: "Women's Fashion",
-        slug: 'womens-fashion',
-        description: 'Timeless silhouettes and effortless wardrobe staples.',
-        image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80',
+        name: 'Sarees',
+        slug: 'saree',
+        description: 'Exquisite Kanjeevarams, handwoven Chanderi silks, lightweight organza, and festive drapes.',
+        image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80',
         isActive: true,
       },
       {
-        name: 'Electronics',
-        slug: 'electronics',
-        description: 'Precision-engineered acoustics, peripherals, and minimalist tech.',
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+        name: 'Maxi Cotton',
+        slug: 'maxi-cotton',
+        description: 'Breathable pure mulmul cotton tiered maxi dresses, day gowns, and comfort-first silhouettes.',
+        image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
         isActive: true,
       },
       {
-        name: 'Footwear',
-        slug: 'footwear',
-        description: 'Artisanal leather boots, minimalist sneakers, and performance shoes.',
-        image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=800&q=80',
+        name: 'Classy Casuals',
+        slug: 'classy-casuals',
+        description: 'Elevated everyday ethnic co-ords, fusion tunics, and modern artisanal workwear.',
+        image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
         isActive: true,
       },
       {
-        name: 'Accessories',
-        slug: 'accessories',
-        description: 'Heirloom timepieces, handcrafted leather goods, and eyewear.',
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+        name: 'Festive Edit',
+        slug: 'festive-edit',
+        description: 'Celebratory jewel-toned anarkalis, festive shararas, and occasion wear with intricate embroidery.',
+        image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
         isActive: true,
       },
       {
-        name: 'Home & Living',
-        slug: 'home-living',
-        description: 'Architectural lighting, artisanal ceramics, and serene lifestyle pieces.',
-        image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+        name: 'Comfy Cotton',
+        slug: 'comfy-cotton',
+        description: 'Hand-block printed cotton kurtis, breezy suits, and effortless relaxed-fit ensembles.',
+        image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
         isActive: true,
       },
     ]);
 
     const catMap = new Map(categories.map((c) => [c.slug, c._id]));
 
-    // 3. Create Brands
-    console.log('[Seed] Creating brands...');
+    // 3. Create Brands / Studio Labels
+    console.log('[Seed] Creating studio brands...');
     const brands = await Brand.create([
       {
-        name: 'Aethelgard Studio',
-        slug: 'aethelgard-studio',
-        description: 'Nordic minimalist tailored apparel and textiles.',
+        name: 'Sculpted Atelier',
+        slug: 'sculpted-atelier',
+        description: 'Flagship bespoke ethnic couture and made-to-measure masterpieces.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
       {
-        name: 'Nomad Atelier',
-        slug: 'nomad-atelier',
-        description: 'Handcrafted full-grain leather bags and travel accessories.',
+        name: 'Effidoo Couture',
+        slug: 'effidoo-couture',
+        description: 'Modern silhouettes honoring traditional Indian weaving legacies.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
       {
-        name: 'Apex Audio',
-        slug: 'apex-audio',
-        description: 'Audiophile grade studio headphones and acoustic instruments.',
+        name: 'Preethika Heritage',
+        slug: 'preethika-heritage',
+        description: 'Handloom Kanjeevarams, antique gold zari borders, and heirloom half-sarees.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
       {
-        name: 'Lumina Living',
-        slug: 'lumina-living',
-        description: 'Architectural ceramics, glassware, and smart ambient lighting.',
+        name: 'Zari & Bloom',
+        slug: 'zari-bloom',
+        description: 'Fresh floral hand-block prints, pure mulmul, and breezy cotton craftsmanship.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
     ]);
 
     const brandMap = new Map(brands.map((b) => [b.slug, b._id]));
 
-    // 4. Create Rich Products with Indian Rupee Prices
-    console.log('[Seed] Creating products with Indian Rupee (₹) pricing...');
+    // Helper to generate 12 standard sizes like Sculpted.in
+    const standardSizes = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'Custom'];
+    const createSizesVariants = (baseSku: string, basePrice: number, stockPerSize = 8) => {
+      return standardSizes.map((size) => ({
+        sku: `${baseSku}-${size}`,
+        price: ['3XL', '4XL', '5XL', 'Custom'].includes(size) ? basePrice + 350 : basePrice,
+        stock: stockPerSize,
+        images: [],
+        attributes: { size },
+      }));
+    };
+
+    // 4. Create Rich Ethnic Fashion Products with INR Pricing
+    console.log('[Seed] Creating ethnic fashion products...');
     const rawProducts = [
       {
-        name: 'Tailored Minimalist Wool Overcoat',
-        slug: 'tailored-minimalist-wool-overcoat',
+        name: '4 in 1 Dreamy Layers Purple & Wine Maxi Anarkali SC091',
+        slug: '4-in-1-dreamy-layers-purple-and-wine-sc091',
         description:
-          'Constructed from double-faced 100% Australian virgin wool, this overcoat delivers unmatched thermal warmth and a drape of quiet sophistication. Features horn buttons, cupro lining, unstructured shoulders, and deep welt pockets designed for both elegance and functional ease.',
-        shortDescription: 'Double-faced virgin wool overcoat with horn buttons and structured silhouette.',
-        category: catMap.get('mens-fashion'),
-        brand: brandMap.get('aethelgard-studio'),
+          'Our signature multi-way convertible outfit designed to be styled as a regal Flared Maxi, an Anarkali Gown, or layered with festive dupattas. Tailored from featherlight pure georgette with tiered cascading frills, hand-crafted bodice, and delicate wine ombre accents. Fully customizable necklines and heights available.',
+        shortDescription: 'Signature 4-in-1 convertible purple & wine layered maxi anarkali in pure georgette.',
+        category: catMap.get('maxi-cotton'),
+        brand: brandMap.get('sculpted-atelier'),
         images: [
-          { url: 'https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=1000&q=85', alt: 'Charcoal Wool Overcoat Front', isMain: true },
-          { url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=1000&q=85', alt: 'Model wearing Charcoal Overcoat' },
-          { url: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=1000&q=85', alt: 'Fabric texture closeup' },
+          { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Purple and Wine Dreamy Layers Front', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=85', alt: 'Flowing Maxi Hem Detail' },
+          { url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=85', alt: 'Bodice Craftsmanship Detail' },
         ],
-        price: 18999.0,
-        compareAtPrice: 24999.0,
-        costPrice: 8500.0,
-        sku: 'OVC-WOL-001',
-        stock: 24,
-        lowStockThreshold: 4,
-        variants: [
-          { sku: 'OVC-WOL-001-S-BLK', price: 18999.0, stock: 8, images: ['https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'S', color: 'Onyx Black', colorHex: '#111827' } },
-          { sku: 'OVC-WOL-001-M-BLK', price: 18999.0, stock: 10, images: ['https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'M', color: 'Onyx Black', colorHex: '#111827' } },
-          { sku: 'OVC-WOL-001-L-CAM', price: 19999.0, stock: 6, images: ['https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'L', color: 'Camel Brown', colorHex: '#92400e' } },
-        ],
-        attributes: {
-          size: ['S', 'M', 'L', 'XL'],
-          color: ['Onyx Black', 'Camel Brown', 'Slate Grey'],
-          material: ['100% Virgin Wool', 'Cupro Lining'],
-        },
-        tags: ['coat', 'outerwear', 'wool', 'menswear', 'luxury'],
+        price: 4650,
+        compareAtPrice: 5950,
+        costPrice: 2200,
+        sku: 'SC091',
+        stock: 55,
+        variants: createSizesVariants('SC091', 4650),
+        tags: ['Best Seller', 'Multi-Way', 'Georgette', 'Party Wear', 'Customizable'],
         featured: true,
         bestSeller: true,
         newArrival: true,
         rating: 4.9,
-        reviewCount: 42,
+        reviewCount: 48,
         isActive: true,
       },
       {
-        name: 'Apex Studio Wireless ANC Headphones',
-        slug: 'apex-studio-wireless-anc-headphones',
+        name: 'Royal Wine & Gold Zari Handloom Half Saree Set SC104',
+        slug: 'royal-wine-gold-zari-handloom-half-saree-sc104',
         description:
-          'Experience spatial acoustics through 45mm custom beryllium dynamic drivers. Features active noise cancellation with transparency mode, 40 hours of continuous playback, aircraft-grade aluminum hinges, and plush lambskin memory foam ear cushions.',
-        shortDescription: 'Custom 45mm dynamic drivers, hybrid ANC, 40h battery, beryllium soundstage.',
-        category: catMap.get('electronics'),
-        brand: brandMap.get('apex-audio'),
+          'A tribute to timeless South Indian heritage. Woven with rich mulberry silk in an opulent wine palette, accented by 3-inch pure antique gold zari borders on the pleated lehenga skirt. Includes an intricately embroidered raw silk blouse and a lightweight contrasting zari dhavani dupatta.',
+        shortDescription: 'Heirloom handloom half saree set featuring gold zari borders and embroidered blouse.',
+        category: catMap.get('lehenga-half-saree'),
+        brand: brandMap.get('preethika-heritage'),
         images: [
-          { url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=85', alt: 'Black Studio ANC Headphones', isMain: true },
-          { url: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=1000&q=85', alt: 'Headphones angle' },
-          { url: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=1000&q=85', alt: 'Headphones with audio cable' },
+          { url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=85', alt: 'Wine and Gold Half Saree Front', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Zari Border Detail' },
+          { url: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1000&q=85', alt: 'Model Drape View' },
         ],
-        price: 14999.0,
-        compareAtPrice: 19999.0,
-        costPrice: 6500.0,
-        sku: 'AUD-ANC-002',
-        stock: 45,
-        lowStockThreshold: 5,
-        variants: [
-          { sku: 'AUD-ANC-002-BLK', price: 14999.0, stock: 25, images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=85'], attributes: { color: 'Matte Obsidian', colorHex: '#18181b' } },
-          { sku: 'AUD-ANC-002-SIL', price: 15999.0, stock: 20, images: ['https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=1000&q=85'], attributes: { color: 'Brushed Silver', colorHex: '#cbd5e1' } },
-        ],
-        attributes: {
-          color: ['Matte Obsidian', 'Brushed Silver'],
-          connectivity: ['Bluetooth 5.3', '3.5mm Hi-Res Jack', 'USB-C Lossless'],
-        },
-        tags: ['audio', 'headphones', 'wireless', 'anc', 'gadget'],
-        featured: true,
-        bestSeller: true,
-        newArrival: false,
-        rating: 4.8,
-        reviewCount: 68,
-        isActive: true,
-      },
-      {
-        name: 'Heritage Full-Grain Leather Weekender',
-        slug: 'heritage-full-grain-leather-weekender',
-        description:
-          'Handmade from vegetable-tanned Tuscan full-grain leather that deepens in patina over decades of journeying. Features solid brass YKK Excella zippers, reinforced riveted leather handles, an interior laptop sleeve, and a separate shoe compartment.',
-        shortDescription: 'Vegetable-tanned Tuscan full-grain leather travel bag with solid brass hardware.',
-        category: catMap.get('accessories'),
-        brand: brandMap.get('nomad-atelier'),
-        images: [
-          { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=85', alt: 'Leather Weekender Duffle', isMain: true },
-          { url: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=85', alt: 'Side view leather bag' },
-        ],
-        price: 12499.0,
-        compareAtPrice: 16999.0,
-        costPrice: 5500.0,
-        sku: 'BAG-LHR-003',
-        stock: 18,
-        lowStockThreshold: 3,
-        variants: [
-          { sku: 'BAG-LHR-003-BRN', price: 12499.0, stock: 10, images: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=85'], attributes: { color: 'Cognac Brown', colorHex: '#78350f' } },
-          { sku: 'BAG-LHR-003-BLK', price: 12499.0, stock: 8, images: ['https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=85'], attributes: { color: 'Espresso Black', colorHex: '#18181b' } },
-        ],
-        attributes: {
-          color: ['Cognac Brown', 'Espresso Black'],
-          capacity: ['42 Liters'],
-        },
-        tags: ['leather', 'bag', 'travel', 'weekender', 'accessories'],
-        featured: true,
-        bestSeller: false,
-        newArrival: true,
-        rating: 4.9,
-        reviewCount: 31,
-        isActive: true,
-      },
-      {
-        name: 'Artisan Chelsea Leather Boots',
-        slug: 'artisan-chelsea-leather-boots',
-        description:
-          'Goodyear-welted Chelsea boots handcrafted by master cobblers. Crafted using French calfskin leather with elasticated side gussets, stacked leather heels with Vibram rubber inserts, and cork-filled footbeds that mold to your foot contours.',
-        shortDescription: 'Goodyear welted French calfskin Chelsea boots with Vibram rubber heels.',
-        category: catMap.get('footwear'),
-        brand: brandMap.get('nomad-atelier'),
-        images: [
-          { url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1000&q=85', alt: 'Chelsea Boot Studio Shot', isMain: true },
-          { url: 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=1000&q=85', alt: 'Boots Pair' },
-        ],
-        price: 9999.0,
-        compareAtPrice: 12999.0,
-        costPrice: 4500.0,
-        sku: 'FTW-CHS-004',
+        price: 6850,
+        compareAtPrice: 8499,
+        costPrice: 3400,
+        sku: 'SC104',
         stock: 32,
-        lowStockThreshold: 4,
-        variants: [
-          { sku: 'FTW-CHS-004-41', price: 9999.0, stock: 8, images: ['https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'UK 7 / EU 41', color: 'Chestnut', colorHex: '#451a03' } },
-          { sku: 'FTW-CHS-004-42', price: 9999.0, stock: 12, images: ['https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'UK 8 / EU 42', color: 'Chestnut', colorHex: '#451a03' } },
-          { sku: 'FTW-CHS-004-43', price: 9999.0, stock: 12, images: ['https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'UK 9 / EU 43', color: 'Chestnut', colorHex: '#451a03' } },
-        ],
-        attributes: {
-          size: ['UK 7 / EU 41', 'UK 8 / EU 42', 'UK 9 / EU 43', 'UK 10 / EU 44'],
-          color: ['Chestnut', 'Black Onyx'],
-        },
-        tags: ['boots', 'footwear', 'chelsea', 'leather', 'shoes'],
-        featured: false,
+        variants: createSizesVariants('SC104', 6850),
+        tags: ['Bridal', 'Half Saree', 'Handloom', 'Silk', 'Best Seller'],
+        featured: true,
         bestSeller: true,
         newArrival: false,
-        rating: 4.7,
-        reviewCount: 54,
+        rating: 5.0,
+        reviewCount: 36,
         isActive: true,
       },
       {
-        name: 'Sculptural Ceramic Pour-Over & Kettle Set',
-        slug: 'sculptural-ceramic-pour-over-kettle-set',
+        name: 'Emerald Bloom Pure Georgette Flared Lehenga SC112',
+        slug: 'emerald-bloom-pure-georgette-flared-lehenga-sc112',
         description:
-          'Wheel-thrown unglazed stoneware exterior paired with a food-safe silky glazed interior. Designed for the discerning coffee ritualist with optimized 60-degree conic interior ribs for uniform extraction and heat retention.',
-        shortDescription: 'Unglazed artisanal stoneware pour-over dripper and matching carafe.',
-        category: catMap.get('home-living'),
-        brand: brandMap.get('lumina-living'),
+          'A show-stopping emerald green flared lehenga adorned with subtle mirror work, sequin embroidery, and an 8-meter circular flair. Comes complete with double lining, built-in can-can support options, and a sweetheart neck designer blouse.',
+        shortDescription: '8-meter flair pure georgette emerald lehenga with sequin & mirror accents.',
+        category: catMap.get('lehenga-half-saree'),
+        brand: brandMap.get('effidoo-couture'),
         images: [
-          { url: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=1000&q=85', alt: 'Artisan Ceramic Coffee Carafe', isMain: true },
-          { url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1000&q=85', alt: 'Pouring Coffee in Ceramic Cup' },
+          { url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=85', alt: 'Emerald Green Flared Lehenga', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Embroidery Detail' },
         ],
-        price: 3499.0,
-        compareAtPrice: 4499.0,
-        costPrice: 1200.0,
-        sku: 'HOM-CER-005',
-        stock: 28,
-        lowStockThreshold: 5,
-        variants: [
-          { sku: 'HOM-CER-005-WHT', price: 3499.0, stock: 15, images: ['https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=1000&q=85'], attributes: { color: 'Sand Dune', colorHex: '#e7e5e4' } },
-          { sku: 'HOM-CER-005-CHR', price: 3499.0, stock: 13, images: ['https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1000&q=85'], attributes: { color: 'Basalt Grey', colorHex: '#475569' } },
-        ],
-        attributes: {
-          color: ['Sand Dune', 'Basalt Grey'],
-          volume: ['650 ml'],
-        },
-        tags: ['home', 'coffee', 'ceramics', 'kitchen', 'minimalist'],
-        featured: false,
-        bestSeller: true,
-        newArrival: true,
-        rating: 4.8,
-        reviewCount: 29,
-        isActive: true,
-      },
-      {
-        name: 'Monochrome Chronograph Wristwatch',
-        slug: 'monochrome-chronograph-wristwatch',
-        description:
-          'Swiss Ronda quartz movement housed in a surgical-grade 316L brushed stainless steel 40mm case. Features domed sapphire crystal glass with anti-reflective coating, quick-release Italian suede strap, and 5ATM water resistance.',
-        shortDescription: '316L steel 40mm case, sapphire crystal, and Swiss Ronda movement.',
-        category: catMap.get('accessories'),
-        brand: brandMap.get('nomad-atelier'),
-        images: [
-          { url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=85', alt: 'Minimalist Watch Face', isMain: true },
-          { url: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=1000&q=85', alt: 'Watch on Wrist' },
-        ],
-        price: 21999.0,
-        compareAtPrice: 28999.0,
-        costPrice: 9500.0,
-        sku: 'ACC-WAT-006',
-        stock: 20,
-        lowStockThreshold: 3,
-        variants: [
-          { sku: 'ACC-WAT-006-SLV', price: 21999.0, stock: 12, images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=85'], attributes: { color: 'Silver / White Dial', colorHex: '#e2e8f0' } },
-          { sku: 'ACC-WAT-006-BLK', price: 22999.0, stock: 8, images: ['https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=1000&q=85'], attributes: { color: 'All Black PVD', colorHex: '#0f172a' } },
-        ],
-        attributes: {
-          color: ['Silver / White Dial', 'All Black PVD'],
-          strap: ['Italian Suede', 'Stainless Steel Mesh'],
-        },
-        tags: ['watch', 'horology', 'accessories', 'minimalist'],
+        price: 7950,
+        compareAtPrice: 9999,
+        costPrice: 3900,
+        sku: 'SC112',
+        stock: 24,
+        variants: createSizesVariants('SC112', 7950),
+        tags: ['New Arrival', 'Lehenga', 'Emerald', 'Party Wear'],
         featured: true,
         bestSeller: false,
         newArrival: true,
-        rating: 4.9,
-        reviewCount: 38,
+        rating: 4.8,
+        reviewCount: 19,
         isActive: true,
       },
       {
-        name: 'Pure Cashmere Relaxed Crewneck',
-        slug: 'pure-cashmere-relaxed-crewneck',
+        name: 'Mulmul Hand-Block Floral Tiered Cotton Maxi Dress SC045',
+        slug: 'mulmul-hand-block-floral-tiered-cotton-maxi-sc045',
         description:
-          'Spun from Grade-A Mongolian cashmere fibers, this crewneck is lightweight yet exceptionally insulating. Ribbed trims at the collar, cuffs, and hem ensure it retains shape through years of wear.',
-        shortDescription: '100% Grade-A Mongolian 2-ply cashmere crewneck knit.',
-        category: catMap.get('womens-fashion'),
-        brand: brandMap.get('aethelgard-studio'),
+          'Crafted from 100% fine Rajasthan mulmul cotton. Hand-block printed using natural azo-free dyes. Features tiered gathers, breathable soft inner lining, elbow-length flutter sleeves, and practical deep side pockets. Effortless summer dressing with an artisan soul.',
+        shortDescription: '100% pure mulmul tiered cotton maxi with hand-block botanical prints.',
+        category: catMap.get('maxi-cotton'),
+        brand: brandMap.get('zari-bloom'),
         images: [
-          { url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=85', alt: 'Cashmere Knit Sweater', isMain: true },
-          { url: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=1000&q=85', alt: 'Knit fabric texture' },
+          { url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=85', alt: 'Floral Tiered Mulmul Maxi', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1000&q=85', alt: 'Soft Cotton Fabric Detail' },
         ],
-        price: 8999.0,
-        compareAtPrice: 11999.0,
-        costPrice: 3800.0,
-        sku: 'WCL-CSH-007',
-        stock: 35,
-        lowStockThreshold: 5,
-        variants: [
-          { sku: 'WCL-CSH-007-S-OAT', price: 8999.0, stock: 12, images: ['https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'S', color: 'Oatmeal Heather', colorHex: '#d6d3d1' } },
-          { sku: 'WCL-CSH-007-M-OAT', price: 8999.0, stock: 15, images: ['https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'M', color: 'Oatmeal Heather', colorHex: '#d6d3d1' } },
-          { sku: 'WCL-CSH-007-L-CHR', price: 8999.0, stock: 8, images: ['https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=1000&q=85'], attributes: { size: 'L', color: 'Charcoal Melange', colorHex: '#334155' } },
-        ],
-        attributes: {
-          size: ['XS', 'S', 'M', 'L'],
-          color: ['Oatmeal Heather', 'Charcoal Melange'],
-        },
-        tags: ['sweater', 'cashmere', 'knitwear', 'womenswear'],
-        featured: true,
+        price: 2850,
+        compareAtPrice: 3650,
+        costPrice: 1200,
+        sku: 'SC045',
+        stock: 60,
+        variants: createSizesVariants('SC045', 2850),
+        tags: ['Mulmul Cotton', 'Hand Block', 'Pockets', 'Everyday Comfort', 'Best Seller'],
+        featured: false,
         bestSeller: true,
         newArrival: false,
         rating: 4.9,
@@ -380,48 +254,222 @@ const seedData = async () => {
         isActive: true,
       },
       {
-        name: 'Acoustic Studio Ambient Desk Lamp',
-        slug: 'acoustic-studio-ambient-desk-lamp',
+        name: 'Kanjeevaram Woven Border Temple Motif Silk Saree SC201',
+        slug: 'kanjeevaram-woven-border-temple-motif-silk-saree-sc201',
         description:
-          'Precision CNC-machined brass stem resting upon a solid Carrara marble base. Features warm dimmable LED chips (2200K - 3000K) controlled by a touch-capacitive knurled dial.',
-        shortDescription: 'Solid Carrara marble base and brushed brass LED ambient lamp.',
-        category: catMap.get('home-living'),
-        brand: brandMap.get('lumina-living'),
+          'An authentic tribute to traditional Tamil craftsmanship. Woven with pure silk threads and featuring intricate temple border motifs (korvai technique). Features a grand contrast zari pallu with peacock and floral buttis, paired with an unstitched contrast silk blouse piece.',
+        shortDescription: 'Pure silk Kanjeevaram saree with temple korvai border and zari pallu.',
+        category: catMap.get('saree'),
+        brand: brandMap.get('preethika-heritage'),
         images: [
-          { url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1000&q=85', alt: 'Modernist Table Lamp', isMain: true },
-          { url: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1000&q=85', alt: 'Lamp in Interior Room' },
+          { url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=85', alt: 'Kanjeevaram Temple Border Saree', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Pallu Zari Weave' },
         ],
-        price: 6499.0,
-        compareAtPrice: 8499.0,
-        costPrice: 2800.0,
-        sku: 'HOM-LMP-008',
-        stock: 15,
-        lowStockThreshold: 3,
-        variants: [
-          { sku: 'HOM-LMP-008-BRS', price: 6499.0, stock: 10, images: ['https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1000&q=85'], attributes: { finish: 'Brushed Brass', colorHex: '#d97706' } },
-          { sku: 'HOM-LMP-008-BLK', price: 6499.0, stock: 5, images: ['https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1000&q=85'], attributes: { finish: 'Matte Anodized Black', colorHex: '#09090b' } },
+        price: 5450,
+        compareAtPrice: 6990,
+        costPrice: 2800,
+        sku: 'SC201',
+        stock: 18,
+        variants: [{ sku: 'SC201-FREE', price: 5450, stock: 18, images: [], attributes: { size: 'Free Size (6.3m with blouse)' } }],
+        tags: ['Saree', 'Kanjeevaram', 'Silk', 'Festive', 'Traditional'],
+        featured: true,
+        bestSeller: true,
+        newArrival: false,
+        rating: 5.0,
+        reviewCount: 29,
+        isActive: true,
+      },
+      {
+        name: 'Pastel Lilac Embroidered Organza Saree SC215',
+        slug: 'pastel-lilac-embroidered-organza-saree-sc215',
+        description:
+          'Ethereal and ultra-lightweight organza in soothing lilac, embellished with cut-work scalloped borders and hand-stitched floral threadwork. Drapes with modern grace for summer weddings, receptions, and festive day soirees.',
+        shortDescription: 'Lightweight pastel lilac organza saree with scalloped embroidered borders.',
+        category: catMap.get('saree'),
+        brand: brandMap.get('effidoo-couture'),
+        images: [
+          { url: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1000&q=85', alt: 'Pastel Lilac Organza Saree', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=85', alt: 'Scallop Border Closeup' },
         ],
-        attributes: {
-          finish: ['Brushed Brass', 'Matte Anodized Black'],
-        },
-        tags: ['lamp', 'lighting', 'interior', 'marble', 'minimalist'],
+        price: 3990,
+        compareAtPrice: 4990,
+        costPrice: 1900,
+        sku: 'SC215',
+        stock: 28,
+        variants: [{ sku: 'SC215-FREE', price: 3990, stock: 28, images: [], attributes: { size: 'Free Size (6.3m with blouse)' } }],
+        tags: ['Organza', 'Pastel', 'Modern Saree', 'New Arrival'],
         featured: false,
         bestSeller: false,
         newArrival: true,
+        rating: 4.7,
+        reviewCount: 15,
+        isActive: true,
+      },
+      {
+        name: 'Crimson Heritage Tiered Cotton Flared Maxi SC078',
+        slug: 'crimson-heritage-tiered-cotton-flared-maxi-sc078',
+        description:
+          'Deep crimson red cotton tiered dress accented with delicate gota patti lace on the sleeves and neckline. Features a high waist elasticated back for a flattering bespoke silhouette that moves beautifully.',
+        shortDescription: 'Tiered crimson flared cotton maxi with subtle gota patti border embellishments.',
+        category: catMap.get('classy-casuals'),
+        brand: brandMap.get('zari-bloom'),
+        images: [
+          { url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=85', alt: 'Crimson Heritage Flared Maxi', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1000&q=85', alt: 'Gota Lace Work' },
+        ],
+        price: 3250,
+        compareAtPrice: 4150,
+        costPrice: 1450,
+        sku: 'SC078',
+        stock: 40,
+        variants: createSizesVariants('SC078', 3250),
+        tags: ['Cotton', 'Classy Casuals', 'Gota Patti', 'Maxi'],
+        featured: false,
+        bestSeller: true,
+        newArrival: false,
         rating: 4.8,
-        reviewCount: 19,
+        reviewCount: 31,
+        isActive: true,
+      },
+      {
+        name: 'Peacock Blue Banarasi Brocade Bridal Lehenga SC305',
+        slug: 'peacock-blue-banarasi-brocade-bridal-lehenga-sc305',
+        description:
+          'A royal masterpiece woven in Varanasi. Rich peacock blue brocade lehenga skirt featuring kadwa weave jaal work in warm antique gold. Accompanied by a heavy zardozi embroidered blouse and a sheer organza dupatta with scalloped borders.',
+        shortDescription: 'Regal peacock blue Banarasi brocade lehenga with antique gold zari work.',
+        category: catMap.get('lehenga-half-saree'),
+        brand: brandMap.get('sculpted-atelier'),
+        images: [
+          { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Banarasi Brocade Lehenga', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=85', alt: 'Gold Brocade Pattern Closeup' },
+        ],
+        price: 9450,
+        compareAtPrice: 12500,
+        costPrice: 4900,
+        sku: 'SC305',
+        stock: 15,
+        variants: createSizesVariants('SC305', 9450),
+        tags: ['Bridal', 'Banarasi', 'Brocade', 'Royal', 'Featured'],
+        featured: true,
+        bestSeller: true,
+        newArrival: false,
+        rating: 5.0,
+        reviewCount: 22,
+        isActive: true,
+      },
+      {
+        name: 'Sunlit Ochre Haldi Anarkali Suit with Dupatta SC099',
+        slug: 'sunlit-ochre-haldi-anarkali-suit-sc099',
+        description:
+          'Radiant ochre yellow anarkali suit tailor-made for Haldi and Mehendi rituals. Features hand-embroidered mirrorwork on the yoke, flared kalis in flowy georgette, and a matching bandhani print dupatta with tassel accents.',
+        shortDescription: 'Festive ochre yellow mirrorwork anarkali suit with bandhani dupatta.',
+        category: catMap.get('festive-edit'),
+        brand: brandMap.get('effidoo-couture'),
+        images: [
+          { url: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1000&q=85', alt: 'Ochre Haldi Anarkali Front', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=85', alt: 'Mirror Yoke Detail' },
+        ],
+        price: 4200,
+        compareAtPrice: 5200,
+        costPrice: 2000,
+        sku: 'SC099',
+        stock: 35,
+        variants: createSizesVariants('SC099', 4200),
+        tags: ['Haldi', 'Mehendi', 'Anarkali', 'Festive', 'New Arrival'],
+        featured: false,
+        bestSeller: false,
+        newArrival: true,
+        rating: 4.9,
+        reviewCount: 18,
+        isActive: true,
+      },
+      {
+        name: 'Vintage Rose Chanderi Silk Saree with Zari Pallu SC230',
+        slug: 'vintage-rose-chanderi-silk-saree-sc230',
+        description:
+          'Breezy, lustrous handloom Chanderi silk in a romantic vintage rose tint. Features delicate gold zari tissue pallu and floral buttis hand-woven across the body. Featherlight weight with a subtle festive sheen.',
+        shortDescription: 'Lustrous vintage rose Chanderi silk saree with gold tissue pallu.',
+        category: catMap.get('saree'),
+        brand: brandMap.get('preethika-heritage'),
+        images: [
+          { url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=85', alt: 'Chanderi Saree in Rose Tint', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Zari Tissue Detail' },
+        ],
+        price: 4850,
+        compareAtPrice: 5999,
+        costPrice: 2400,
+        sku: 'SC230',
+        stock: 22,
+        variants: [{ sku: 'SC230-FREE', price: 4850, stock: 22, images: [], attributes: { size: 'Free Size (6.3m with blouse)' } }],
+        tags: ['Chanderi', 'Handloom', 'Silk Saree', 'Pastel Elegance'],
+        featured: true,
+        bestSeller: false,
+        newArrival: false,
+        rating: 4.8,
+        reviewCount: 27,
+        isActive: true,
+      },
+      {
+        name: 'Midnight Navy Velvet Cocktail Half Saree SC118',
+        slug: 'midnight-navy-velvet-cocktail-half-saree-sc118',
+        description:
+          'Rich midnight navy micro-velvet blouse paired with a metallic pleated shimmer skirt and pre-pleated drape dhavani. Modern, glamorous, and structured for wedding receptions and evening sangeets.',
+        shortDescription: 'Modern velvet & metallic shimmer cocktail half saree ensemble.',
+        category: catMap.get('lehenga-half-saree'),
+        brand: brandMap.get('sculpted-atelier'),
+        images: [
+          { url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=85', alt: 'Midnight Navy Velvet Set', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Metallic Shimmer Skirt Detail' },
+        ],
+        price: 7250,
+        compareAtPrice: 8990,
+        costPrice: 3600,
+        sku: 'SC118',
+        stock: 19,
+        variants: createSizesVariants('SC118', 7250),
+        tags: ['Velvet', 'Cocktail', 'Half Saree', 'Sangeet'],
+        featured: false,
+        bestSeller: false,
+        newArrival: true,
+        rating: 4.9,
+        reviewCount: 14,
+        isActive: true,
+      },
+      {
+        name: 'Ivory & Gold Pearl Embellished Festive Kurti Set SC062',
+        slug: 'ivory-gold-pearl-embellished-festive-kurti-sc062',
+        description:
+          'Pure handwoven cotton silk straight kurti in ivory, finished with pearl neck embroidery, matching straight pants, and a gold foil printed chiffon dupatta. Comfortable elegance for family poojas and intimate gatherings.',
+        shortDescription: 'Ivory cotton silk kurti set with delicate pearl hand embroidery.',
+        category: catMap.get('comfy-cotton'),
+        brand: brandMap.get('zari-bloom'),
+        images: [
+          { url: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1000&q=85', alt: 'Ivory Pearl Kurti Set', isMain: true },
+          { url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=85', alt: 'Pearl Work Closeup' },
+        ],
+        price: 3600,
+        compareAtPrice: 4500,
+        costPrice: 1700,
+        sku: 'SC062',
+        stock: 45,
+        variants: createSizesVariants('SC062', 3600),
+        tags: ['Cotton Silk', 'Pearl Work', 'Ivory', 'Comfy Cotton', 'Festive'],
+        featured: false,
+        bestSeller: true,
+        newArrival: false,
+        rating: 4.8,
+        reviewCount: 38,
         isActive: true,
       },
     ];
 
     const products = await Product.create(rawProducts);
-    console.log(`[Seed] Successfully created ${products.length} products.`);
 
-    // 5. Create Coupons in Indian Rupees (₹)
-    console.log('[Seed] Creating promotional coupons with INR thresholds...');
+    // 5. Create Promotional Coupons
+    console.log('[Seed] Creating promotional coupons...');
     const now = new Date();
     const futureDate = new Date();
-    futureDate.setMonth(now.getMonth() + 6);
+    futureDate.setFullYear(now.getFullYear() + 2);
 
     await Coupon.create([
       {
@@ -429,94 +477,95 @@ const seedData = async () => {
         discountType: 'percentage',
         discountValue: 10,
         minimumOrderAmount: 999,
-        maximumDiscount: 1000,
+        maximumDiscount: 1500,
         startDate: now,
         expiryDate: futureDate,
-        usageLimit: 1000,
+        usageLimit: 10000,
         perUserLimit: 1,
         isActive: true,
       },
       {
-        code: 'FIRST500',
-        discountType: 'fixed',
-        discountValue: 500,
-        minimumOrderAmount: 2499,
-        startDate: now,
-        expiryDate: futureDate,
-        usageLimit: 500,
-        perUserLimit: 1,
-        isActive: true,
-      },
-      {
-        code: 'FESTIVE20',
+        code: 'SCULPTED20',
         discountType: 'percentage',
         discountValue: 20,
         minimumOrderAmount: 4999,
-        maximumDiscount: 2500,
+        maximumDiscount: 3000,
         startDate: now,
         expiryDate: futureDate,
         usageLimit: 500,
         perUserLimit: 2,
         isActive: true,
       },
+      {
+        code: 'FREESHIP',
+        discountType: 'fixed',
+        discountValue: 200,
+        minimumOrderAmount: 1499,
+        maximumDiscount: 200,
+        startDate: now,
+        expiryDate: futureDate,
+        usageLimit: 2000,
+        perUserLimit: 3,
+        isActive: true,
+      },
     ]);
 
-    // 6. Create Verified Reviews
+    // 6. Create Verified Customer Reviews
     console.log('[Seed] Creating verified customer reviews...');
     await Review.create([
       {
         product: products[0]._id,
         user: customer._id,
         rating: 5,
-        title: 'Outstanding tailoring and premium fabric weight',
+        title: 'The fit is absolutely magical! 4 in 1 layers are incredible',
         comment:
-          'The wool drape is magnificent. Unstructured yet holds its shape effortlessly. Wore it during travel to Himachal and kept me wonderfully warm. True Indian luxury craftsmanship.',
-        images: ['https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=400&q=80'],
+          'I ordered this for my sister’s engagement reception. The custom height option was spot on — no alterations needed at all! The georgette fabric is soft, fluid, and very light to wear all evening. Will definitely purchase again!',
+        images: ['https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=80'],
         isVerifiedPurchase: true,
-        helpfulVotes: 14,
+        helpfulVotes: 28,
       },
       {
         product: products[1]._id,
         user: customer._id,
         rating: 5,
-        title: 'Studio level fidelity with superb ANC',
+        title: 'Pure traditional elegance, stunning zari work',
         comment:
-          'Far exceeds expectations compared to generic plastic consumer headphones. Soundstage is airy and wide with natural instrument separation. Memory foam cups are pure luxury.',
-        images: [],
+          'The wine color with real antique gold border looks 10x richer in person than in pictures. The dhavani pleats beautifully. Express shipping arrived in Chennai in just 3 days.',
+        images: ['https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=400&q=80'],
         isVerifiedPurchase: true,
-        helpfulVotes: 9,
+        helpfulVotes: 19,
       },
     ]);
 
-    // 7. Create Demo Orders in INR with Indian Addresses
-    console.log('[Seed] Creating demo Indian orders for dashboard metrics...');
+    // 7. Create Demo Indian Orders for Admin Metrics
+    console.log('[Seed] Creating demo Indian orders...');
     const order1Items = [
       {
-        product: products[1]._id,
-        name: products[1].name,
-        image: products[1].images[0]?.url || '',
-        price: products[1].price,
+        product: products[0]._id,
+        name: products[0].name,
+        image: products[0].images[0]?.url || '',
+        price: products[0].price,
         quantity: 1,
-        sku: products[1].sku,
-        attributes: { color: 'Matte Obsidian' },
+        sku: 'SC091-M',
+        attributes: { size: 'M', height: "5'4\"", neckDesign: 'Sweet Heart', addOns: ['Can Can (+₹650)'] },
       },
     ];
-    const order1Subtotal = 14999;
-    const order1Tax = Math.round(order1Subtotal * 0.18 * 100) / 100;
+    const order1Subtotal = 4650 + 650;
+    const order1Tax = Math.round(order1Subtotal * 0.05 * 100) / 100;
     const order1Total = order1Subtotal + order1Tax;
 
     await Order.create({
-      orderNumber: 'ORD-20260919-8921',
+      orderNumber: 'ORD-20260924-1042',
       user: customer._id,
       items: order1Items,
       shippingAddress: {
-        fullName: 'Sophia Chen',
-        phone: '+91 91234 56789',
-        addressLine1: 'Flat 402, Signature Towers, Indiranagar',
-        addressLine2: '100 Feet Road',
-        city: 'Bengaluru',
-        state: 'Karnataka',
-        postalCode: '560038',
+        fullName: 'Preethi Sundaram',
+        phone: '+91 99525 37388',
+        addressLine1: 'No. 42, Anna Nagar 2nd Avenue',
+        addressLine2: 'Near Roundtana',
+        city: 'Chennai',
+        state: 'Tamil Nadu',
+        postalCode: '600040',
         country: 'India',
       },
       subtotal: order1Subtotal,
@@ -524,103 +573,35 @@ const seedData = async () => {
       shippingFee: 0,
       tax: order1Tax,
       total: order1Total,
-      paymentMethod: 'stripe',
+      paymentMethod: 'UPI / PayU',
       paymentStatus: 'Paid',
       orderStatus: 'Processing',
-      trackingNumber: 'BLUEDART-5592810',
+      trackingNumber: 'DELHIVERY-7749219',
+      notes: 'Custom height 5\'4" with Sweetheart neckline and added Can Can for evening flare.',
       timeline: [
         {
           status: 'Pending',
-          timestamp: new Date(Date.now() - 3600000 * 24),
-          note: 'Order placed via UPI / Card',
+          timestamp: new Date(Date.now() - 3600000 * 20),
+          note: 'Order placed via UPI',
         },
         {
           status: 'Confirmed',
-          timestamp: new Date(Date.now() - 3600000 * 20),
-          note: 'Payment verified via Stripe INR',
+          timestamp: new Date(Date.now() - 3600000 * 18),
+          note: 'Payment verified and measurements reviewed by master tailor',
         },
         {
           status: 'Processing',
-          timestamp: new Date(Date.now() - 3600000 * 4),
-          note: 'Package prepared at Bengaluru Fulfillment Hub',
+          timestamp: new Date(Date.now() - 3600000 * 6),
+          note: 'Pattern cut and custom Can Can stitching in progress at Atelier',
         },
       ],
-      createdAt: new Date(Date.now() - 3600000 * 24),
+      createdAt: new Date(Date.now() - 3600000 * 20),
     });
 
-    const order2Items = [
-      {
-        product: products[4]._id,
-        name: products[4].name,
-        image: products[4].images[0]?.url || '',
-        price: products[4].price,
-        quantity: 1,
-        sku: products[4].sku,
-        attributes: { color: 'Sand Dune' },
-      },
-    ];
-    const order2Subtotal = 3499;
-    const order2Discount = 349.9; // 10% WELCOME10
-    const order2Discounted = order2Subtotal - order2Discount;
-    const order2Tax = Math.round(order2Discounted * 0.18 * 100) / 100;
-    const order2Total = Math.round((order2Discounted + order2Tax) * 100) / 100;
-
-    await Order.create({
-      orderNumber: 'ORD-20260918-3419',
-      user: customer._id,
-      items: order2Items,
-      shippingAddress: {
-        fullName: 'Sophia Chen',
-        phone: '+91 91234 56789',
-        addressLine1: 'Flat 402, Signature Towers, Indiranagar',
-        addressLine2: '100 Feet Road',
-        city: 'Bengaluru',
-        state: 'Karnataka',
-        postalCode: '560038',
-        country: 'India',
-      },
-      subtotal: order2Subtotal,
-      discount: order2Discount,
-      couponCode: 'WELCOME10',
-      shippingFee: 0,
-      tax: order2Tax,
-      total: order2Total,
-      paymentMethod: 'stripe',
-      paymentStatus: 'Paid',
-      orderStatus: 'Delivered',
-      trackingNumber: 'DELHIVERY-9948211',
-      timeline: [
-        {
-          status: 'Confirmed',
-          timestamp: new Date(Date.now() - 3600000 * 48),
-          note: 'Payment verified',
-        },
-        {
-          status: 'Shipped',
-          timestamp: new Date(Date.now() - 3600000 * 36),
-          note: 'Dispatched via Delhivery Express',
-        },
-        {
-          status: 'Delivered',
-          timestamp: new Date(Date.now() - 3600000 * 12),
-          note: 'Delivered to recipient in Indiranagar, Bengaluru',
-        },
-      ],
-      createdAt: new Date(Date.now() - 3600000 * 48),
-    });
-
-    console.log('=============================================');
-    console.log('  Database Seeding Completed Successfully!   ');
-    console.log('  Currency: Indian Rupee (₹ / INR)          ');
-    console.log('  Admin:    admin@ecommerce.com / Admin@123456');
-    console.log('  Customer: customer@ecommerce.com / Customer@123456');
-    console.log('  Coupons:  WELCOME10, FIRST500, FESTIVE20    ');
-    console.log('=============================================');
-
-    await mongoose.disconnect();
+    console.log('[Seed] Database seeding completed successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('[Seed Error]:', error);
+    console.error('[Seed] Seeding failed:', error);
     process.exit(1);
   }
 };

@@ -40,7 +40,7 @@ export const addToCart = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { productId, variantId, quantity = 1 } = req.body;
+    const { productId, variantId, quantity = 1, customAttributes, priceOverride } = req.body;
     const guestId = (req.headers['x-guest-id'] as string) || req.body.guestId;
 
     const product = await Product.findById(productId);
@@ -64,8 +64,16 @@ export const addToCart = async (
         if (variant.images && variant.images.length > 0) {
           itemImage = variant.images[0];
         }
-        itemAttributes = variant.attributes;
+        itemAttributes = variant.attributes ? Object.fromEntries(variant.attributes instanceof Map ? variant.attributes : Object.entries(variant.attributes)) : {};
       }
+    }
+
+    if (customAttributes && typeof customAttributes === 'object') {
+      itemAttributes = { ...itemAttributes, ...customAttributes };
+    }
+
+    if (priceOverride && typeof priceOverride === 'number' && priceOverride >= itemPrice) {
+      itemPrice = priceOverride;
     }
 
     if (availableStock < quantity) {
@@ -89,11 +97,12 @@ export const addToCart = async (
       return;
     }
 
-    // Check if same product & variant already in cart
+    // Check if same product & variant & attributes already in cart
     const existingIndex = cart.items.findIndex(
       (item) =>
         item.product.toString() === productId &&
-        (item.variantId || '') === (variantId || '')
+        (item.variantId || '') === (variantId || '') &&
+        JSON.stringify(item.attributes || {}) === JSON.stringify(itemAttributes || {})
     );
 
     if (existingIndex > -1) {
@@ -103,7 +112,7 @@ export const addToCart = async (
         return;
       }
       cart.items[existingIndex].quantity = newQty;
-      cart.items[existingIndex].price = itemPrice; // update with latest price
+      cart.items[existingIndex].price = itemPrice;
     } else {
       cart.items.push({
         product: product._id,
