@@ -52,7 +52,7 @@ const seedData = async () => {
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
     });
 
-    // 2. Create Categories (Matching Sculpted.in)
+    // 2. Create Categories
     console.log('[Seed] Creating categories...');
     const categories = await Category.create([
       {
@@ -105,8 +105,8 @@ const seedData = async () => {
     console.log('[Seed] Creating studio brands...');
     const brands = await Brand.create([
       {
-        name: 'Sculpted Atelier',
-        slug: 'sculpted-atelier',
+        name: 'Effidoo Atelier',
+        slug: 'effidoo-atelier',
         description: 'Flagship bespoke ethnic couture and made-to-measure masterpieces.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
@@ -117,8 +117,8 @@ const seedData = async () => {
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
       {
-        name: 'Preethika Heritage',
-        slug: 'preethika-heritage',
+        name: 'Effidoo Heritage',
+        slug: 'effidoo-heritage',
         description: 'Handloom Kanjeevarams, antique gold zari borders, and heirloom half-sarees.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
@@ -132,7 +132,7 @@ const seedData = async () => {
 
     const brandMap = new Map(brands.map((b) => [b.slug, b._id]));
 
-    // Helper to generate 12 standard sizes like Sculpted.in
+    // Helper to generate 12 standard sizes
     const standardSizes = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'Custom'];
     const createSizesVariants = (baseSku: string, basePrice: number, stockPerSize = 8) => {
       return standardSizes.map((size) => ({
@@ -154,7 +154,7 @@ const seedData = async () => {
           'Our signature multi-way convertible outfit designed to be styled as a regal Flared Maxi, an Anarkali Gown, or layered with festive dupattas. Tailored from featherlight pure georgette with tiered cascading frills, hand-crafted bodice, and delicate wine ombre accents. Fully customizable necklines and heights available.',
         shortDescription: 'Signature 4-in-1 convertible purple & wine layered maxi anarkali in pure georgette.',
         category: catMap.get('maxi-cotton'),
-        brand: brandMap.get('sculpted-atelier'),
+        brand: brandMap.get('effidoo-atelier'),
         images: [
           { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Purple and Wine Dreamy Layers Front', isMain: true },
           { url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=85', alt: 'Flowing Maxi Hem Detail' },
@@ -181,7 +181,7 @@ const seedData = async () => {
           'A tribute to timeless South Indian heritage. Woven with rich mulberry silk in an opulent wine palette, accented by 3-inch pure antique gold zari borders on the pleated lehenga skirt. Includes an intricately embroidered raw silk blouse and a lightweight contrasting zari dhavani dupatta.',
         shortDescription: 'Heirloom handloom half saree set featuring gold zari borders and embroidered blouse.',
         category: catMap.get('lehenga-half-saree'),
-        brand: brandMap.get('preethika-heritage'),
+        brand: brandMap.get('effidoo-heritage'),
         images: [
           { url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=85', alt: 'Wine and Gold Half Saree Front', isMain: true },
           { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Zari Border Detail' },
@@ -260,7 +260,7 @@ const seedData = async () => {
           'An authentic tribute to traditional Tamil craftsmanship. Woven with pure silk threads and featuring intricate temple border motifs (korvai technique). Features a grand contrast zari pallu with peacock and floral buttis, paired with an unstitched contrast silk blouse piece.',
         shortDescription: 'Pure silk Kanjeevaram saree with temple korvai border and zari pallu.',
         category: catMap.get('saree'),
-        brand: brandMap.get('preethika-heritage'),
+        brand: brandMap.get('effidoo-heritage'),
         images: [
           { url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=85', alt: 'Kanjeevaram Temple Border Saree', isMain: true },
           { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Pallu Zari Weave' },
@@ -338,7 +338,7 @@ const seedData = async () => {
           'A royal masterpiece woven in Varanasi. Rich peacock blue brocade lehenga skirt featuring kadwa weave jaal work in warm antique gold. Accompanied by a heavy zardozi embroidered blouse and a sheer organza dupatta with scalloped borders.',
         shortDescription: 'Regal peacock blue Banarasi brocade lehenga with antique gold zari work.',
         category: catMap.get('lehenga-half-saree'),
-        brand: brandMap.get('sculpted-atelier'),
+        brand: brandMap.get('effidoo-atelier'),
         images: [
           { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Banarasi Brocade Lehenga', isMain: true },
           { url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=85', alt: 'Gold Brocade Pattern Closeup' },
@@ -390,7 +390,7 @@ const seedData = async () => {
           'Breezy, lustrous handloom Chanderi silk in a romantic vintage rose tint. Features delicate gold zari tissue pallu and floral buttis hand-woven across the body. Featherlight weight with a subtle festive sheen.',
         shortDescription: 'Lustrous vintage rose Chanderi silk saree with gold tissue pallu.',
         category: catMap.get('saree'),
-        brand: brandMap.get('preethika-heritage'),
+        brand: brandMap.get('effidoo-heritage'),
         images: [
           { url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=85', alt: 'Chanderi Saree in Rose Tint', isMain: true },
           { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Zari Tissue Detail' },
@@ -416,7 +416,7 @@ const seedData = async () => {
           'Rich midnight navy micro-velvet blouse paired with a metallic pleated shimmer skirt and pre-pleated drape dhavani. Modern, glamorous, and structured for wedding receptions and evening sangeets.',
         shortDescription: 'Modern velvet & metallic shimmer cocktail half saree ensemble.',
         category: catMap.get('lehenga-half-saree'),
-        brand: brandMap.get('sculpted-atelier'),
+        brand: brandMap.get('effidoo-atelier'),
         images: [
           { url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=85', alt: 'Midnight Navy Velvet Set', isMain: true },
           { url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=85', alt: 'Metallic Shimmer Skirt Detail' },
@@ -485,7 +485,7 @@ const seedData = async () => {
         isActive: true,
       },
       {
-        code: 'SCULPTED20',
+        code: 'EFFIDOO20',
         discountType: 'percentage',
         discountValue: 20,
         minimumOrderAmount: 4999,
