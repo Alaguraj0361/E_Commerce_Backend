@@ -24,6 +24,7 @@ import orderRoutes from './routes/order.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
+import contactRoutes from './routes/contact.routes.js';
 import { handleStripeWebhook } from './controllers/webhook.controller.js';
 
 
@@ -99,6 +100,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/contact', contactRoutes);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {
