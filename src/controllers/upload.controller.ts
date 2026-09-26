@@ -34,7 +34,7 @@ const fileFilter = (_req: any, file: Express.Multer.File, cb: multer.FileFilterC
 
 export const uploadMiddleware = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter,
 });
 
@@ -43,8 +43,13 @@ export const uploadSingleImage = (req: Request, res: Response): void => {
     sendError(res, 'No image file uploaded', 400);
     return;
   }
-  const fileUrl = `/uploads/${req.file.filename}`;
-  sendSuccess(res, 'Image uploaded successfully', { url: fileUrl });
+  const host = req.get('host') || 'localhost:5000';
+  const protocol = req.protocol || 'http';
+  const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+  sendSuccess(res, 'Image uploaded successfully', { 
+    url: fileUrl, 
+    relativeUrl: `/uploads/${req.file.filename}` 
+  });
 };
 
 export const uploadMultipleImages = (req: Request, res: Response): void => {
@@ -53,6 +58,15 @@ export const uploadMultipleImages = (req: Request, res: Response): void => {
     sendError(res, 'No image files uploaded', 400);
     return;
   }
-  const urls = files.map((f) => `/uploads/${f.filename}`);
-  sendSuccess(res, 'Images uploaded successfully', { urls });
+  const host = req.get('host') || 'localhost:5000';
+  const protocol = req.protocol || 'http';
+  const urls = files.map((f) => `${protocol}://${host}/uploads/${f.filename}`);
+  sendSuccess(res, 'Images uploaded successfully', { 
+    urls,
+    files: files.map((f) => ({
+      url: `${protocol}://${host}/uploads/${f.filename}`,
+      filename: f.filename,
+      originalName: f.originalname,
+    })),
+  });
 };

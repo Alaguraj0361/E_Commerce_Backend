@@ -9,6 +9,6 @@ import { authenticate } from '../middleware/auth.js';
 const router = Router();
 
 router.post('/single', authenticate, uploadMiddleware.single('image'), uploadSingleImage);
-router.post('/multiple', authenticate, uploadMiddleware.array('images', 5), uploadMultipleImages);
+router.post('/multiple', authenticate, uploadMiddleware.array('images', 10), uploadMultipleImages);
 
 export default router;
