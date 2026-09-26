@@ -34,7 +34,7 @@ const seedData = async () => {
       firstName: 'Alaguraj',
       lastName: 'Admin',
       email: 'admin@ecommerce.com',
-      phone: '+91 93619 23406',
+      phone: '+91 78712 07631',
       password: 'Admin@123456',
       role: 'admin',
       isEmailVerified: true,
