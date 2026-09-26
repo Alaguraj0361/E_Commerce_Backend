@@ -53,6 +53,9 @@ export interface IOrder extends Document {
   orderStatus: 'Pending' | 'Confirmed' | 'Processing' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Refunded';
   stripePaymentIntentId?: string;
   stripeSessionId?: string;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
   trackingNumber?: string;
   notes?: string;
   timeline: IOrderTimeline[];
@@ -144,6 +147,9 @@ const OrderSchema = new Schema<IOrder>(
     },
     stripePaymentIntentId: { type: String, index: true },
     stripeSessionId: { type: String, index: true },
+    razorpayOrderId: { type: String, index: true },
+    razorpayPaymentId: { type: String, index: true },
+    razorpaySignature: { type: String },
     trackingNumber: { type: String, default: '' },
     notes: { type: String, default: '' },
     timeline: [TimelineSchema],

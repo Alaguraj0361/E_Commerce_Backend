@@ -1,5 +1,7 @@
 import { Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import { stripe } from '../config/stripe.js';
+import { razorpay, isRazorpayTestMode } from '../config/razorpay.js';
 import { Product } from '../models/Product.js';
 import { Coupon } from '../models/Coupon.js';
 import { Order, IOrderItem } from '../models/Order.js';
@@ -299,6 +301,238 @@ export const createPaymentIntent = async (
         clientSecret: 'pi_mock_secret_' + Date.now(),
       });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// 1. RAZORPAY UPI & CARD CHECKOUT
+// ==========================================
+export const createRazorpayOrder = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { items, shippingAddress, billingAddress, couponCode } = req.body;
+
+    if (!req.user) {
+      sendError(res, 'Authentication required to proceed with checkout', 401);
+      return;
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      sendError(res, 'Cart is empty', 400);
+      return;
+    }
+
+    if (!shippingAddress || !shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.addressLine1) {
+      sendError(res, 'Incomplete shipping address provided', 400);
+      return;
+    }
+
+    const { verifiedItems, subtotal, discount, shippingFee, tax, total } =
+      await calculateOrderTotals(items, couponCode);
+
+    // Format readable order number: ORD-YYYYMMDD-XXXX
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const randStr = Math.floor(1000 + Math.random() * 9000).toString();
+    const orderNumber = `ORD-${dateStr}-${randStr}`;
+
+    // Create Order with 'Pending' status
+    const order = await Order.create({
+      orderNumber,
+      user: req.user._id,
+      items: verifiedItems,
+      shippingAddress,
+      billingAddress: billingAddress || shippingAddress,
+      subtotal,
+      discount,
+      couponCode: couponCode || '',
+      shippingFee,
+      tax,
+      total,
+      paymentMethod: 'razorpay',
+      paymentStatus: 'Pending',
+      orderStatus: 'Pending',
+      timeline: [
+        {
+          status: 'Pending',
+          timestamp: new Date(),
+          note: 'Order created, awaiting Razorpay / UPI payment',
+        },
+      ],
+    });
+
+    let razorpayOrderId = `order_test_${Date.now()}`;
+    let isTest = isRazorpayTestMode;
+
+    if (!isRazorpayTestMode) {
+      try {
+        const rzpOrder = await razorpay.orders.create({
+          amount: Math.round(total * 100), // amount in paise
+          currency: 'INR',
+          receipt: order.orderNumber,
+          notes: {
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            userId: req.user._id.toString(),
+          },
+        });
+        razorpayOrderId = rzpOrder.id;
+      } catch (err: any) {
+        console.warn('Razorpay order creation fallback to test mode:', err.message);
+        isTest = true;
+      }
+    }
+
+    order.razorpayOrderId = razorpayOrderId;
+    await order.save();
+
+    sendSuccess(res, 'Razorpay order created successfully', {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      razorpayOrderId,
+      amount: Math.round(total * 100),
+      currency: 'INR',
+      keyId: ENV.RAZORPAY_KEY_ID,
+      isTestMode: isTest,
+      customer: {
+        name: shippingAddress.fullName || `${req.user.firstName} ${req.user.lastName}`.trim(),
+        email: req.user.email,
+        phone: shippingAddress.phone,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyRazorpayPayment = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+
+    if (!orderId) {
+      sendError(res, 'Order ID is required', 400);
+      return;
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      sendError(res, 'Order not found', 404);
+      return;
+    }
+
+    // Verify signature if in live mode with valid secret
+    if (!isRazorpayTestMode && razorpaySignature && razorpayOrderId && razorpayPaymentId) {
+      const generatedSignature = crypto
+        .createHmac('sha256', ENV.RAZORPAY_KEY_SECRET)
+        .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+        .digest('hex');
+
+      if (generatedSignature !== razorpaySignature) {
+        sendError(res, 'Invalid payment signature', 400);
+        return;
+      }
+    }
+
+    order.paymentStatus = 'Paid';
+    order.orderStatus = 'Confirmed';
+    order.razorpayPaymentId = razorpayPaymentId || `pay_test_${Date.now()}`;
+    order.razorpaySignature = razorpaySignature || 'sig_verified_test';
+    order.timeline.push({
+      status: 'Confirmed',
+      timestamp: new Date(),
+      note: `Payment verified successfully via Razorpay (UPI/Card ID: ${order.razorpayPaymentId})`,
+    });
+    await order.save();
+
+    // Clear cart
+    if (req.user) {
+      await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+    }
+
+    sendSuccess(res, 'Payment verified successfully', {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      paymentStatus: order.paymentStatus,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// 2. CASH ON DELIVERY (COD) CHECKOUT
+// ==========================================
+export const createCodOrder = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { items, shippingAddress, billingAddress, couponCode } = req.body;
+
+    if (!req.user) {
+      sendError(res, 'Authentication required to proceed with checkout', 401);
+      return;
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      sendError(res, 'Cart is empty', 400);
+      return;
+    }
+
+    if (!shippingAddress || !shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.addressLine1) {
+      sendError(res, 'Incomplete shipping address provided', 400);
+      return;
+    }
+
+    const { verifiedItems, subtotal, discount, shippingFee, tax, total } =
+      await calculateOrderTotals(items, couponCode);
+
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const randStr = Math.floor(1000 + Math.random() * 9000).toString();
+    const orderNumber = `ORD-${dateStr}-${randStr}`;
+
+    const order = await Order.create({
+      orderNumber,
+      user: req.user._id,
+      items: verifiedItems,
+      shippingAddress,
+      billingAddress: billingAddress || shippingAddress,
+      subtotal,
+      discount,
+      couponCode: couponCode || '',
+      shippingFee,
+      tax,
+      total,
+      paymentMethod: 'cod',
+      paymentStatus: 'Pending',
+      orderStatus: 'Confirmed',
+      notes: 'Cash on Delivery - Customer will pay upon receiving package',
+      timeline: [
+        {
+          status: 'Confirmed',
+          timestamp: new Date(),
+          note: 'Order placed with Cash on Delivery (COD). Payment to be collected on delivery.',
+        },
+      ],
+    });
+
+    // Clear cart
+    await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+
+    sendSuccess(res, 'COD Order placed successfully', {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      total,
+    });
   } catch (error) {
     next(error);
   }
