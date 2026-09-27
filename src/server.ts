@@ -38,15 +38,28 @@ app.use(
 );
 
 // CORS
+const allowedOrigins = [
+  ENV.FRONTEND_URL?.replace(/\/$/, ''),
+  'https://nalmarafashion.vercel.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3001',
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: [
-      ENV.FRONTEND_URL,
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://localhost:3001',
-      'http://127.0.0.1:3001',
-    ],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/$/, '');
+      if (
+        allowedOrigins.includes(cleanOrigin) ||
+        cleanOrigin.endsWith('.vercel.app')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-guest-id'],
