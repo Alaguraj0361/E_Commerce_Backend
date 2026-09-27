@@ -112,19 +112,19 @@ const seedData = async () => {
     console.log('[Seed] Creating studio brands...');
     const brands = await Brand.create([
       {
-        name: 'EFFIDOO Heritage',
+        name: 'NALMARA FASHION Heritage',
         slug: 'effidoo-heritage',
         description: 'Pure handloom silks, antique zari weaving, and heirloom classics.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
       {
-        name: 'EFFIDOO Atelier',
+        name: 'NALMARA FASHION Atelier',
         slug: 'effidoo-atelier',
         description: 'Contemporary bridal silhouettes and made-to-measure masterpieces.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
       },
       {
-        name: 'EFFIDOO Couture',
+        name: 'NALMARA FASHION Couture',
         slug: 'effidoo-couture',
         description: 'Luxury festive ensembles and statement occasion wear.',
         logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80',
