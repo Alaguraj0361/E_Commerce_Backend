@@ -4,6 +4,8 @@ import {
   getOrderById,
   getAllOrders,
   updateOrderStatus,
+  deleteOrder,
+  clearAllOrders,
 } from '../controllers/order.controller.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
@@ -23,5 +25,7 @@ router.put(
   validate(updateOrderStatusSchema),
   updateOrderStatus
 );
+router.delete('/admin/clear-all', authenticate, requireAdmin, clearAllOrders);
+router.delete('/admin/:id', authenticate, requireAdmin, deleteOrder);
 
 export default router;

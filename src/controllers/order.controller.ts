@@ -121,3 +121,42 @@ export const updateOrderStatus = async (
     next(error);
   }
 };
+
+export const deleteOrder = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findByIdAndDelete(id);
+
+    if (!order) {
+      sendError(res, 'Order not found', 404);
+      return;
+    }
+
+    sendSuccess(res, 'Order permanently deleted', {
+      id: order._id,
+      orderNumber: order.orderNumber,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const clearAllOrders = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const result = await Order.deleteMany({});
+    sendSuccess(res, `All orders cleared successfully (${result.deletedCount} removed)`, {
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
