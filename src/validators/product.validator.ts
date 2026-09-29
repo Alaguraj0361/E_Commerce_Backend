@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const createProductSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
+  slug: z.string().optional(),
   description: z.string().min(1, 'Description is required'),
   shortDescription: z.string().optional(),
   brand: z.string().optional(),
@@ -33,6 +34,7 @@ export const createProductSchema = z.object({
   featured: z.boolean().optional(),
   bestSeller: z.boolean().optional(),
   newArrival: z.boolean().optional(),
+  hasBespokeTailoring: z.boolean().optional(),
   isActive: z.boolean().optional(),
 });
 

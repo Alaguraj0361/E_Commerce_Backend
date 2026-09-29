@@ -262,19 +262,33 @@ export const createProduct = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { name, ...rest } = req.body;
+    const { name, slug: customSlug, ...rest } = req.body;
 
-    // Generate slug
-    let slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    // Use custom slug if provided, otherwise derive from name
+    const rawSlug =
+      customSlug && typeof customSlug === 'string' && customSlug.trim() !== ''
+        ? customSlug
+        : name;
+
+    let slug = (rawSlug || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+
+    if (!slug) {
+      slug = `product-${Date.now().toString().slice(-6)}`;
+    }
+
     const existing = await Product.findOne({ slug });
     if (existing) {
       slug = `${slug}-${Date.now().toString().slice(-4)}`;
     }
 
     const product = await Product.create({
+      ...rest,
       name,
       slug,
-      ...rest,
     });
 
     sendSuccess(res, 'Product created successfully', product, 201);
@@ -290,7 +304,30 @@ export const updateProduct = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, req.body, {
+    const updateData = { ...req.body };
+
+    // If slug field is present in payload, sanitize or regenerate
+    if ('slug' in updateData) {
+      if (!updateData.slug || typeof updateData.slug !== 'string' || updateData.slug.trim() === '') {
+        if (updateData.name) {
+          updateData.slug = updateData.name
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)+/g, '');
+        } else {
+          delete updateData.slug;
+        }
+      } else {
+        updateData.slug = updateData.slug
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, '');
+      }
+    }
+
+    const product = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     }).populate('category brand');

@@ -13,7 +13,9 @@ export const validate = (schema: ZodSchema) => {
           field: err.path.join('.'),
           message: err.message,
         }));
-        sendError(res, 'Validation failed', 400, formattedErrors);
+        const detailedMessage =
+          formattedErrors.map((err) => err.message).filter(Boolean).join(', ') || 'Validation failed';
+        sendError(res, detailedMessage, 400, formattedErrors);
         return;
       }
       sendError(res, 'Invalid request data', 400);

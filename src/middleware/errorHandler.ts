@@ -23,7 +23,9 @@ export const errorHandler = (
       field: e.path,
       message: e.message,
     }));
-    sendError(res, 'Database validation failed', 400, errors);
+    const detailedMessage =
+      errors.map((e: any) => e.message).filter(Boolean).join(', ') || 'Database validation failed';
+    sendError(res, detailedMessage, 400, errors);
     return;
   }
 

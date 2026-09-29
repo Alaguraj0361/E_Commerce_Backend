@@ -190,6 +190,18 @@ const ProductSchema = new Schema<IProduct>(
   }
 );
 
+// Pre-validate hook to ensure slug is always populated if name is present
+ProductSchema.pre('validate', function (next) {
+  if ((!this.slug || typeof this.slug !== 'string' || this.slug.trim() === '') && this.name) {
+    this.slug = this.name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+  }
+  next();
+});
+
 // Compound text index for search
 ProductSchema.index({ name: 'text', description: 'text', tags: 'text' });
 
