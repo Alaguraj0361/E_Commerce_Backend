@@ -42,6 +42,7 @@ export interface IProduct extends Document {
   featured: boolean;
   bestSeller: boolean;
   newArrival: boolean;
+  hasBespokeTailoring?: boolean;
   rating: number;
   reviewCount: number;
   isActive: boolean;
@@ -161,6 +162,10 @@ const ProductSchema = new Schema<IProduct>(
       type: Boolean,
       default: false,
       index: true,
+    },
+    hasBespokeTailoring: {
+      type: Boolean,
+      default: false,
     },
     rating: {
       type: Number,

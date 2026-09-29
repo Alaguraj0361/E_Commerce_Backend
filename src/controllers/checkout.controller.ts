@@ -87,8 +87,8 @@ export const calculateOrderTotals = async (
   // Shipping: Free delivery across India on orders >= ₹1,499, else standard shipping is ₹99
   const shippingFee = subtotalAfterDiscount >= 1499 || subtotalAfterDiscount === 0 ? 0 : 99;
 
-  // Tax: Standard Indian 18% GST on discounted subtotal
-  const tax = Math.round(subtotalAfterDiscount * 0.18 * 100) / 100;
+  // Tax: Standard Indian 5% GST on discounted subtotal
+  const tax = Math.round(subtotalAfterDiscount * 0.05 * 100) / 100;
 
   // Total
   const total = Math.round((subtotalAfterDiscount + shippingFee + tax) * 100) / 100;
