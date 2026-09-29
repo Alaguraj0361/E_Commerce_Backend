@@ -134,3 +134,97 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
     res.status(500).json({ error: 'Webhook processing failed' });
   }
 };
+
+export const handleRazorpayWebhook = async (req: Request, res: Response): Promise<void> => {
+  const signature = req.headers['x-razorpay-signature'] as string;
+
+  try {
+    const rawPayload = Buffer.isBuffer(req.body)
+      ? req.body.toString('utf8')
+      : typeof req.body === 'string'
+      ? req.body
+      : JSON.stringify(req.body);
+
+    // Verify webhook signature if secret configured
+    if (ENV.RAZORPAY_WEBHOOK_SECRET && !ENV.RAZORPAY_WEBHOOK_SECRET.includes('placeholder')) {
+      const crypto = await import('crypto');
+      const expectedSignature = crypto
+        .createHmac('sha256', ENV.RAZORPAY_WEBHOOK_SECRET)
+        .update(rawPayload)
+        .digest('hex');
+
+      if (expectedSignature !== signature) {
+        console.warn('[Razorpay Webhook Warning] Webhook signature verification failed');
+        res.status(400).json({ error: 'Invalid webhook signature' });
+        return;
+      }
+    }
+
+    const event = typeof req.body === 'object' && !Buffer.isBuffer(req.body)
+      ? req.body
+      : JSON.parse(rawPayload);
+
+    console.log(`[Razorpay Webhook] Received event: ${event.event}`);
+
+    const payment = event.payload?.payment?.entity;
+    const orderEntity = event.payload?.order?.entity;
+    const razorpayOrderId = payment?.order_id || orderEntity?.id;
+    const razorpayPaymentId = payment?.id;
+
+    if (razorpayOrderId) {
+      const order = await Order.findOne({ razorpayOrderId });
+
+      if (order) {
+        if (event.event === 'payment.captured' || event.event === 'order.paid') {
+          if (order.paymentStatus !== 'Paid') {
+            order.paymentStatus = 'Paid';
+            order.orderStatus = 'Confirmed';
+            order.razorpayPaymentId = razorpayPaymentId || order.razorpayPaymentId;
+            order.timeline.push({
+              status: 'Confirmed',
+              timestamp: new Date(),
+              note: `Payment verified via Razorpay Webhook (${event.event})`,
+            });
+            await order.save();
+
+            // Safely decrement inventory stock
+            for (const item of order.items) {
+              await Product.findByIdAndUpdate(item.product, {
+                $inc: { stock: -item.quantity },
+              });
+              if (item.variantId) {
+                await Product.updateOne(
+                  { _id: item.product, 'variants._id': item.variantId },
+                  { $inc: { 'variants.$.stock': -item.quantity } }
+                );
+              }
+            }
+
+            // Clear cart
+            if (order.user) {
+              await Cart.findOneAndUpdate({ user: order.user }, { items: [] });
+            }
+            console.log(`[Razorpay Webhook] Order ${order.orderNumber} successfully confirmed`);
+          }
+        } else if (event.event === 'payment.failed') {
+          if (order.paymentStatus !== 'Paid') {
+            order.paymentStatus = 'Failed';
+            order.timeline.push({
+              status: 'Payment Failed',
+              timestamp: new Date(),
+              note: payment?.error_description || 'Payment failed on Razorpay gateway',
+            });
+            await order.save();
+            console.warn(`[Razorpay Webhook] Order ${order.orderNumber} payment marked failed`);
+          }
+        }
+      }
+    }
+
+    res.status(200).json({ status: 'ok' });
+  } catch (error: any) {
+    console.error('[Razorpay Webhook Processing Error]:', error);
+    res.status(500).json({ error: 'Webhook processing failed' });
+  }
+};
+

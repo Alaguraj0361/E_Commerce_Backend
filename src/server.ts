@@ -25,7 +25,7 @@ import reviewRoutes from './routes/review.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
-import { handleStripeWebhook } from './controllers/webhook.controller.js';
+import { handleStripeWebhook, handleRazorpayWebhook } from './controllers/webhook.controller.js';
 
 
 const app = express();
@@ -76,6 +76,13 @@ app.post(
   '/api/payments/webhook',
   express.raw({ type: 'application/json' }),
   handleStripeWebhook
+);
+
+// 2. Razorpay Webhook: Receives raw buffer for HMAC SHA256 signature verification
+app.post(
+  '/api/payments/razorpay/webhook',
+  express.raw({ type: 'application/json' }),
+  handleRazorpayWebhook
 );
 
 // 2. Standard Body Parsing
