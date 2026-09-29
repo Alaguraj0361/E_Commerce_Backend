@@ -221,6 +221,26 @@ export const handleRazorpayWebhook = async (req: Request, res: Response): Promis
       }
     }
 
+    // Handle refund events
+    if (event.event === 'refund.processed') {
+      const refundEntity = event.payload?.refund?.entity;
+      const paymentId = refundEntity?.payment_id;
+      if (paymentId) {
+        const order = await Order.findOne({ razorpayPaymentId: paymentId });
+        if (order) {
+          order.paymentStatus = 'Refunded';
+          order.orderStatus = 'Refunded';
+          order.timeline.push({
+            status: 'Refunded',
+            timestamp: new Date(),
+            note: `Refund of ₹${((refundEntity.amount || 0) / 100).toFixed(2)} processed via Razorpay (${refundEntity.id})`,
+          });
+          await order.save();
+          console.log(`[Razorpay Webhook] Order ${order.orderNumber} marked as Refunded`);
+        }
+      }
+    }
+
     res.status(200).json({ status: 'ok' });
   } catch (error: any) {
     console.error('[Razorpay Webhook Processing Error]:', error);
