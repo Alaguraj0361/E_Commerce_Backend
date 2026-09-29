@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { stripe } from '../config/stripe.js';
-import { razorpay, isRazorpayTestMode } from '../config/razorpay.js';
+import { razorpay, isRazorpayTestMode, isRazorpayConfigured } from '../config/razorpay.js';
 import { Product } from '../models/Product.js';
 import { Coupon } from '../models/Coupon.js';
 import { Order, IOrderItem } from '../models/Order.js';
@@ -366,9 +366,8 @@ export const createRazorpayOrder = async (
     });
 
     let razorpayOrderId = `order_test_${Date.now()}`;
-    let isTest = isRazorpayTestMode;
 
-    if (!isRazorpayTestMode) {
+    if (isRazorpayConfigured) {
       try {
         const rzpOrder = await razorpay.orders.create({
           amount: Math.round(total * 100), // amount in paise
@@ -383,7 +382,6 @@ export const createRazorpayOrder = async (
         razorpayOrderId = rzpOrder.id;
       } catch (err: any) {
         console.warn('Razorpay order creation fallback to test mode:', err.message);
-        isTest = true;
       }
     }
 
@@ -397,7 +395,8 @@ export const createRazorpayOrder = async (
       amount: Math.round(total * 100),
       currency: 'INR',
       keyId: ENV.RAZORPAY_KEY_ID,
-      isTestMode: isTest,
+      isConfigured: isRazorpayConfigured,
+      isTestMode: isRazorpayTestMode,
       customer: {
         name: shippingAddress.fullName || `${req.user.firstName} ${req.user.lastName}`.trim(),
         email: req.user.email,
@@ -428,8 +427,8 @@ export const verifyRazorpayPayment = async (
       return;
     }
 
-    // Verify signature if in live mode with valid secret
-    if (!isRazorpayTestMode && razorpaySignature && razorpayOrderId && razorpayPaymentId) {
+    // Verify signature if configured with valid secret
+    if (isRazorpayConfigured && razorpaySignature && razorpayOrderId && razorpayPaymentId) {
       const generatedSignature = crypto
         .createHmac('sha256', ENV.RAZORPAY_KEY_SECRET)
         .update(`${razorpayOrderId}|${razorpayPaymentId}`)
@@ -451,6 +450,19 @@ export const verifyRazorpayPayment = async (
       note: `Payment verified successfully via Razorpay (UPI/Card ID: ${order.razorpayPaymentId})`,
     });
     await order.save();
+
+    // Decrement inventory stock safely
+    for (const item of order.items) {
+      await Product.findByIdAndUpdate(item.product, {
+        $inc: { stock: -item.quantity },
+      });
+      if (item.variantId) {
+        await Product.updateOne(
+          { _id: item.product, 'variants._id': item.variantId },
+          { $inc: { 'variants.$.stock': -item.quantity } }
+        );
+      }
+    }
 
     // Clear cart
     if (req.user) {
