@@ -78,10 +78,22 @@ export const trackOrderPublic = async (
       query = { orderNumber: { $regex: new RegExp(`^${clean}$`, 'i') } };
     }
 
-    const order = await Order.findOne(query).populate('items.product', 'name slug images price');
+    let order = await Order.findOne(query).populate('items.product', 'name slug images price');
+
+    // If not found and search term is at least 4 characters, try partial order number match
+    if (!order && clean.length >= 4) {
+      const sanitized = clean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      order = await Order.findOne({
+        orderNumber: { $regex: new RegExp(sanitized, 'i') },
+      }).populate('items.product', 'name slug images price');
+    }
 
     if (!order) {
-      sendError(res, `No order found matching "${clean}". Please verify your details.`, 404);
+      res.status(200).json({
+        success: false,
+        message: `No order found matching "${clean}". Please verify your Order ID (e.g. ORD-20260929-9377) from your order confirmation email or SMS.`,
+        data: null,
+      });
       return;
     }
 
