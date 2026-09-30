@@ -31,7 +31,7 @@ export const errorHandler = (
 
   // CastError (e.g. invalid ObjectId)
   if (err.name === 'CastError') {
-    sendError(res, `Resource not found with ID of ${err.value}`, 404);
+    sendError(res, `No matching order or record found for "${err.value}". Please check your details.`, 404);
     return;
   }
 

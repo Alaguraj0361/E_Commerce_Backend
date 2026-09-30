@@ -1,4 +1,5 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import { Order } from '../models/Order.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
@@ -23,23 +24,68 @@ export const getOrderById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const order = await Order.findById(id).populate('items.product', 'name slug images price');
+    const clean = (id || '').trim();
+
+    let query: any = {};
+    if (mongoose.Types.ObjectId.isValid(clean)) {
+      query = { $or: [{ _id: clean }, { orderNumber: clean }] };
+    } else {
+      query = { orderNumber: { $regex: new RegExp(`^${clean}$`, 'i') } };
+    }
+
+    const order = await Order.findOne(query).populate('items.product', 'name slug images price');
 
     if (!order) {
-      sendError(res, 'Order not found', 404);
+      sendError(res, `Order #${clean} not found. Please verify your order number.`, 404);
       return;
     }
 
     // Verify ownership or admin
     if (
-      req.user!.role !== 'admin' &&
-      order.user.toString() !== req.user!._id.toString()
+      req.user &&
+      req.user.role !== 'admin' &&
+      order.user &&
+      order.user.toString() !== req.user._id.toString()
     ) {
       sendError(res, 'Unauthorized to view this order', 403);
       return;
     }
 
     sendSuccess(res, 'Order retrieved successfully', order);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const trackOrderPublic = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { identifier } = req.params;
+    const clean = (identifier || '').trim();
+
+    if (!clean) {
+      sendError(res, 'Please provide an Order ID or Order Number', 400);
+      return;
+    }
+
+    let query: any = {};
+    if (mongoose.Types.ObjectId.isValid(clean)) {
+      query = { $or: [{ _id: clean }, { orderNumber: clean }] };
+    } else {
+      query = { orderNumber: { $regex: new RegExp(`^${clean}$`, 'i') } };
+    }
+
+    const order = await Order.findOne(query).populate('items.product', 'name slug images price');
+
+    if (!order) {
+      sendError(res, `No order found matching "${clean}". Please verify your details.`, 404);
+      return;
+    }
+
+    sendSuccess(res, 'Order tracking details retrieved successfully', order);
   } catch (error) {
     next(error);
   }

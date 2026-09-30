@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getUserOrders,
   getOrderById,
+  trackOrderPublic,
   getAllOrders,
   updateOrderStatus,
   deleteOrder,
@@ -13,6 +14,7 @@ import { updateOrderStatusSchema } from '../validators/order.validator.js';
 
 const router = Router();
 
+router.get('/track/:identifier', trackOrderPublic);
 router.get('/', authenticate, getUserOrders);
 router.get('/:id', authenticate, getOrderById);
 
