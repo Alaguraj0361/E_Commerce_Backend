@@ -167,7 +167,9 @@ export const getProductBySlug = async (
 ): Promise<void> => {
   try {
     const { slug } = req.params;
-    const product = await Product.findOne({ slug, isActive: true })
+    const isObjectId = typeof slug === 'string' && mongoose.Types.ObjectId.isValid(slug) && slug.length === 24;
+    const query: any = isObjectId ? { $or: [{ slug }, { _id: slug }], isActive: true } : { slug, isActive: true };
+    const product = await Product.findOne(query)
       .populate('category', 'name slug description')
       .populate('brand', 'name slug logo description');
 

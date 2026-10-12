@@ -6,6 +6,7 @@ import { Order } from '../models/Order.js';
 import { Product } from '../models/Product.js';
 import { Cart } from '../models/Cart.js';
 import { Coupon } from '../models/Coupon.js';
+import { decrementInventoryAtomic } from '../utils/inventory.js';
 
 export const handleStripeWebhook = async (req: Request, res: Response): Promise<void> => {
   const sig = req.headers['stripe-signature'];
@@ -50,18 +51,8 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
             });
             await order.save();
 
-            // Decrement product inventory safely
-            for (const item of order.items) {
-              await Product.findByIdAndUpdate(item.product, {
-                $inc: { stock: -item.quantity },
-              });
-              if (item.variantId) {
-                await Product.updateOne(
-                  { _id: item.product, 'variants._id': item.variantId },
-                  { $inc: { 'variants.$.stock': -item.quantity } }
-                );
-              }
-            }
+            // Decrement product inventory atomically
+            await decrementInventoryAtomic(order.items);
 
             // Clear user's cart
             if (order.user) {
@@ -187,18 +178,8 @@ export const handleRazorpayWebhook = async (req: Request, res: Response): Promis
             });
             await order.save();
 
-            // Safely decrement inventory stock
-            for (const item of order.items) {
-              await Product.findByIdAndUpdate(item.product, {
-                $inc: { stock: -item.quantity },
-              });
-              if (item.variantId) {
-                await Product.updateOne(
-                  { _id: item.product, 'variants._id': item.variantId },
-                  { $inc: { 'variants.$.stock': -item.quantity } }
-                );
-              }
-            }
+            // Atomically decrement inventory stock
+            await decrementInventoryAtomic(order.items);
 
             // Clear cart
             if (order.user) {

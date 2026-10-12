@@ -27,7 +27,7 @@ export const getDashboardStats = async (
       Product.countDocuments({ isActive: true }),
       Order.countDocuments({ orderStatus: 'Pending' }),
       Product.find({ stock: { $lte: 5 }, isActive: true }).select('name sku stock price images'),
-      Order.find({ paymentStatus: 'Paid' }).select('total createdAt'),
+      Order.find({ paymentStatus: 'Paid', orderStatus: { $nin: ['Cancelled', 'Refunded'] } }).select('total createdAt'),
       Order.find()
         .populate('user', 'firstName lastName email')
         .sort({ createdAt: -1 })
@@ -47,8 +47,15 @@ export const getDashboardStats = async (
       d.setDate(now.getDate() - i);
       const dateStr = d.toISOString().slice(0, 10);
 
-      const dayOrders = paidOrders.filter((o) => o.createdAt.toISOString().slice(0, 10) === dateStr);
-      const daySales = dayOrders.reduce((sum, o) => sum + o.total, 0);
+      const dayOrders = paidOrders.filter((o) => {
+        if (!o.createdAt) return false;
+        try {
+          return new Date(o.createdAt).toISOString().slice(0, 10) === dateStr;
+        } catch {
+          return false;
+        }
+      });
+      const daySales = dayOrders.reduce((sum, o) => sum + (o.total || 0), 0);
 
       last7Days.push({
         date: dateStr,

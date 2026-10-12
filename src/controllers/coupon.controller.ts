@@ -53,7 +53,10 @@ export const validateCoupon = async (
 
     // Per user usage check
     if (req.user && coupon.perUserLimit) {
-      const userUsage = coupon.userUsages.get(req.user._id.toString()) || 0;
+      const userIdStr = req.user._id.toString();
+      const userUsage = (coupon.userUsages && typeof (coupon.userUsages as any).get === 'function')
+        ? ((coupon.userUsages as any).get(userIdStr) || 0)
+        : ((coupon.userUsages as any)?.[userIdStr] || 0);
       if (userUsage >= coupon.perUserLimit) {
         sendError(res, 'You have already reached the maximum usage limit for this coupon', 400);
         return;

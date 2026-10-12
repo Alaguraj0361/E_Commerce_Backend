@@ -104,11 +104,12 @@ export const createReview = async (
 
     // Recompute product rating & count
     const allReviews = await Review.find({ product: productId }).select('rating');
-    const totalRating = allReviews.reduce((acc, curr) => acc + curr.rating, 0);
-    const avg = Math.round((totalRating / allReviews.length) * 10) / 10;
+    const validRatings = allReviews.map((r) => Number(r.rating)).filter((r) => !isNaN(r) && r > 0);
+    const totalRating = validRatings.reduce((acc, curr) => acc + curr, 0);
+    const avg = validRatings.length > 0 ? Math.round((totalRating / validRatings.length) * 10) / 10 : 0;
 
     product.rating = avg;
-    product.reviewCount = allReviews.length;
+    product.reviewCount = validRatings.length;
     await product.save();
 
     const populated = await Review.findById(review._id).populate('user', 'firstName lastName avatar');
@@ -190,12 +191,13 @@ export const deleteReviewAdmin = async (
 
     // Recalculate product rating
     const allReviews = await Review.find({ product: review.product }).select('rating');
-    const totalRating = allReviews.reduce((acc, curr) => acc + curr.rating, 0);
-    const avg = allReviews.length > 0 ? Math.round((totalRating / allReviews.length) * 10) / 10 : 0;
+    const validRatings = allReviews.map((r) => Number(r.rating)).filter((r) => !isNaN(r) && r > 0);
+    const totalRating = validRatings.reduce((acc, curr) => acc + curr, 0);
+    const avg = validRatings.length > 0 ? Math.round((totalRating / validRatings.length) * 10) / 10 : 0;
 
     await Product.findByIdAndUpdate(review.product, {
       rating: avg,
-      reviewCount: allReviews.length,
+      reviewCount: validRatings.length,
     });
 
     sendSuccess(res, 'Review moderated and removed successfully');

@@ -9,6 +9,7 @@ import { Cart } from '../models/Cart.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 import { ENV } from '../config/env.js';
+import { decrementInventoryAtomic, rollbackInventory } from '../utils/inventory.js';
 
 export const calculateOrderTotals = async (
   items: Array<{ productId: string; variantId?: string; quantity: number }>,
@@ -240,18 +241,8 @@ export const createCheckoutSession = async (
       });
       await order.save();
 
-      // Decrement inventory safely
-      for (const item of verifiedItems) {
-        await Product.findByIdAndUpdate(item.product, {
-          $inc: { stock: -item.quantity },
-        });
-        if (item.variantId) {
-          await Product.updateOne(
-            { _id: item.product, 'variants._id': item.variantId },
-            { $inc: { 'variants.$.stock': -item.quantity } }
-          );
-        }
-      }
+      // Decrement inventory atomically
+      await decrementInventoryAtomic(verifiedItems);
 
       // Clear user's cart
       await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
@@ -440,6 +431,15 @@ export const verifyRazorpayPayment = async (
       }
     }
 
+    if (order.paymentStatus === 'Paid') {
+      sendSuccess(res, 'Payment already verified', {
+        orderId: order._id,
+        orderNumber: order.orderNumber,
+        paymentStatus: order.paymentStatus,
+      });
+      return;
+    }
+
     order.paymentStatus = 'Paid';
     order.orderStatus = 'Confirmed';
     order.razorpayPaymentId = razorpayPaymentId || `pay_test_${Date.now()}`;
@@ -451,18 +451,8 @@ export const verifyRazorpayPayment = async (
     });
     await order.save();
 
-    // Decrement inventory stock safely
-    for (const item of order.items) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: -item.quantity },
-      });
-      if (item.variantId) {
-        await Product.updateOne(
-          { _id: item.product, 'variants._id': item.variantId },
-          { $inc: { 'variants.$.stock': -item.quantity } }
-        );
-      }
-    }
+    // Decrement inventory stock atomically
+    await decrementInventoryAtomic(order.items);
 
     // Clear cart
     if (req.user) {
@@ -512,30 +502,44 @@ export const createCodOrder = async (
     const randStr = Math.floor(1000 + Math.random() * 9000).toString();
     const orderNumber = `ORD-${dateStr}-${randStr}`;
 
-    const order = await Order.create({
-      orderNumber,
-      user: req.user._id,
-      items: verifiedItems,
-      shippingAddress,
-      billingAddress: billingAddress || shippingAddress,
-      subtotal,
-      discount,
-      couponCode: couponCode || '',
-      shippingFee,
-      tax,
-      total,
-      paymentMethod: 'cod',
-      paymentStatus: 'Pending',
-      orderStatus: 'Confirmed',
-      notes: 'Cash on Delivery - Customer will pay upon receiving package',
-      timeline: [
-        {
-          status: 'Confirmed',
-          timestamp: new Date(),
-          note: 'Order placed with Cash on Delivery (COD). Payment to be collected on delivery.',
-        },
-      ],
-    });
+    // 1. Atomically decrement stock with race-condition and overselling prevention
+    const decrementResult = await decrementInventoryAtomic(verifiedItems);
+    if (!decrementResult.success) {
+      sendError(res, decrementResult.errorMessage || 'Insufficient stock for one or more items', 400);
+      return;
+    }
+
+    let order;
+    try {
+      order = await Order.create({
+        orderNumber,
+        user: req.user._id,
+        items: verifiedItems,
+        shippingAddress,
+        billingAddress: billingAddress || shippingAddress,
+        subtotal,
+        discount,
+        couponCode: couponCode || '',
+        shippingFee,
+        tax,
+        total,
+        paymentMethod: 'cod',
+        paymentStatus: 'Pending',
+        orderStatus: 'Confirmed',
+        notes: 'Cash on Delivery - Customer will pay upon receiving package',
+        timeline: [
+          {
+            status: 'Confirmed',
+            timestamp: new Date(),
+            note: 'Order placed with Cash on Delivery (COD). Payment to be collected on delivery.',
+          },
+        ],
+      });
+    } catch (orderCreateErr) {
+      // Roll back inventory if order document creation fails
+      await rollbackInventory(verifiedItems);
+      throw orderCreateErr;
+    }
 
     // Clear cart
     await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
