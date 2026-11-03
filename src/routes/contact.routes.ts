@@ -46,7 +46,7 @@ router.post('/enquiry', async (req: Request, res: Response) => {
           <p>Dear ${name},</p>
           <p>Thank you for reaching out to NALMARA FASHION. Our bespoke styling concierge has received your enquiry regarding <strong>${enquiryType || 'our collections'}</strong>.</p>
           <p>A senior designer or dedicated stylist will review your request and get in touch with you within <strong>24 business hours</strong>.</p>
-          <p>If your enquiry is urgent or you wish to schedule a private video consultation, please contact our concierge team at <strong style="color: #0B2518;">+91 78712 07631</strong>.</p>
+          <p>If your enquiry is urgent or you wish to schedule a private video consultation, please contact our concierge team at <strong style="color: #0B2518;">6383163609  |  7871207631</strong>.</p>
           <br/>
           <p style="font-style: italic; color: #555;">With royal regards,<br/><strong>The NALMARA FASHION Concierge Team</strong></p>
         </div>
