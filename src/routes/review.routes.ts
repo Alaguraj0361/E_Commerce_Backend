@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  getPublicReviews,
   getProductReviews,
   createReview,
   voteHelpful,
@@ -12,6 +13,7 @@ import { createReviewSchema } from '../validators/review.validator.js';
 
 const router = Router();
 
+router.get('/', getPublicReviews);
 router.get('/admin/all', authenticate, requireAdmin, getAllReviewsAdmin);
 router.delete('/admin/:id', authenticate, requireAdmin, deleteReviewAdmin);
 

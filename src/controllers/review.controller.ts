@@ -5,6 +5,25 @@ import { Order } from '../models/Order.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 
+export const getPublicReviews = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const limitNum = Math.max(1, Math.min(24, parseInt((req.query.limit as string) || '6', 10)));
+    const reviews = await Review.find({ rating: { $gte: 4 } })
+      .populate('user', 'firstName lastName avatar')
+      .populate('product', 'name slug images')
+      .sort({ rating: -1, createdAt: -1 })
+      .limit(limitNum);
+
+    sendSuccess(res, 'Public reviews retrieved successfully', reviews);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getProductReviews = async (
   req: Request,
   res: Response,
