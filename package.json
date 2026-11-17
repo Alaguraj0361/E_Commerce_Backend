@@ -10,7 +10,9 @@
     "postinstall": "tsc",
     "start": "node dist/server.js",
     "seed": "tsx src/seed/seed.ts",
-    "test:e2e": "tsx src/test-e2e.ts"
+    "seed:test-product": "tsx src/scripts/add-test-product.ts",
+    "test:e2e": "tsx src/test-e2e.ts",
+    "test:webhooks": "tsx src/test-razorpay-webhooks.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

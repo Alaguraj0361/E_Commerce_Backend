@@ -85,11 +85,22 @@ export const calculateOrderTotals = async (
   discount = Math.round(discount * 100) / 100;
   const subtotalAfterDiscount = Math.max(0, subtotal - discount);
 
-  // Shipping: Free delivery across India on orders >= ₹1,499, else standard shipping is ₹99
-  const shippingFee = subtotalAfterDiscount >= 1499 || subtotalAfterDiscount === 0 ? 0 : 99;
+  // Check if the order contains exclusively the test product ('testing' / 'TEST-1RS' / ₹1 test item)
+  const isOnlyTestProduct =
+    verifiedItems.length > 0 &&
+    verifiedItems.every(
+      (it) =>
+        it.name?.trim().toLowerCase() === 'testing' ||
+        it.sku?.toUpperCase() === 'TEST-1RS' ||
+        it.price === 1
+    );
 
-  // Tax: Standard Indian 5% GST on discounted subtotal
-  const tax = Math.round(subtotalAfterDiscount * 0.05 * 100) / 100;
+  // Shipping: Free delivery across India on orders >= ₹1,499 or test product, else standard shipping is ₹99
+  const shippingFee =
+    isOnlyTestProduct || subtotalAfterDiscount >= 1499 || subtotalAfterDiscount === 0 ? 0 : 99;
+
+  // Tax: 0 for test product, else standard Indian 5% GST on discounted subtotal
+  const tax = isOnlyTestProduct ? 0 : Math.round(subtotalAfterDiscount * 0.05 * 100) / 100;
 
   // Total
   const total = Math.round((subtotalAfterDiscount + shippingFee + tax) * 100) / 100;
@@ -418,14 +429,17 @@ export const verifyRazorpayPayment = async (
       return;
     }
 
-    // Verify signature if configured with valid secret
+    // Verify signature securely with constant-time comparison
     if (isRazorpayConfigured && razorpaySignature && razorpayOrderId && razorpayPaymentId) {
       const generatedSignature = crypto
         .createHmac('sha256', ENV.RAZORPAY_KEY_SECRET)
         .update(`${razorpayOrderId}|${razorpayPaymentId}`)
         .digest('hex');
 
-      if (generatedSignature !== razorpaySignature) {
+      const genBuf = Buffer.from(generatedSignature, 'utf8');
+      const sigBuf = Buffer.from(razorpaySignature, 'utf8');
+
+      if (genBuf.length !== sigBuf.length || !crypto.timingSafeEqual(genBuf, sigBuf)) {
         sendError(res, 'Invalid payment signature', 400);
         return;
       }
@@ -440,29 +454,60 @@ export const verifyRazorpayPayment = async (
       return;
     }
 
-    order.paymentStatus = 'Paid';
-    order.orderStatus = 'Confirmed';
-    order.razorpayPaymentId = razorpayPaymentId || `pay_test_${Date.now()}`;
-    order.razorpaySignature = razorpaySignature || 'sig_verified_test';
-    order.timeline.push({
-      status: 'Confirmed',
-      timestamp: new Date(),
-      note: `Payment verified successfully via Razorpay (UPI/Card ID: ${order.razorpayPaymentId})`,
-    });
-    await order.save();
+    // Atomically transition payment status to prevent concurrent double-decrement with webhooks
+    const updatedOrder = await Order.findOneAndUpdate(
+      {
+        _id: order._id,
+        paymentStatus: { $ne: 'Paid' },
+      },
+      {
+        $set: {
+          paymentStatus: 'Paid',
+          orderStatus: 'Confirmed',
+          razorpayPaymentId: razorpayPaymentId || `pay_test_${Date.now()}`,
+          razorpaySignature: razorpaySignature || 'sig_verified_test',
+          razorpayPaymentStatus: 'captured',
+        },
+        $push: {
+          timeline: {
+            status: 'Confirmed',
+            timestamp: new Date(),
+            note: `Payment verified successfully via Razorpay (UPI/Card ID: ${razorpayPaymentId || 'verified'})`,
+          },
+        },
+      },
+      { new: true }
+    );
 
-    // Decrement inventory stock atomically
-    await decrementInventoryAtomic(order.items);
+    if (updatedOrder) {
+      // Decrement inventory stock atomically
+      if (updatedOrder.items && updatedOrder.items.length > 0) {
+        await decrementInventoryAtomic(updatedOrder.items);
+      }
 
-    // Clear cart
-    if (req.user) {
-      await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+      // Clear cart
+      if (req.user) {
+        await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+      }
+
+      // Record coupon usage
+      if (updatedOrder.couponCode) {
+        await Coupon.findOneAndUpdate(
+          { code: updatedOrder.couponCode },
+          {
+            $inc: {
+              usedCount: 1,
+              [`userUsages.${updatedOrder.user}`]: 1,
+            },
+          }
+        );
+      }
     }
 
     sendSuccess(res, 'Payment verified successfully', {
       orderId: order._id,
       orderNumber: order.orderNumber,
-      paymentStatus: order.paymentStatus,
+      paymentStatus: 'Paid',
     });
   } catch (error) {
     next(error);

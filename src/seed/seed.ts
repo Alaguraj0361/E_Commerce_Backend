@@ -35,21 +35,21 @@ const seedData = async () => {
       lastName: 'Admin',
       email: 'admin@ecommerce.com',
       phone: '+91 78712 07631',
-      password: 'Admin@123456',
+      password: ' ',
       role: 'admin',
       isEmailVerified: true,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     });
 
     const customer = await User.create({
-      firstName: 'Preethi',
+      firstName: 'Priya',
       lastName: 'Sundaram',
       email: 'customer@ecommerce.com',
       phone: '+91 99525 37388',
-      password: 'Customer@123456',
+      password: 'Password@123',
       role: 'customer',
       isEmailVerified: true,
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
     });
 
     // 2. Create the Featured Categories matching NALMARA FASHION Design
@@ -574,6 +574,35 @@ const seedData = async () => {
         newArrival: true,
         rating: 4.8,
         reviewCount: 72,
+        isActive: true,
+      },
+      {
+        name: 'testing',
+        slug: 'testing',
+        description:
+          'Live payment gateway verification product. Specially configured for ₹1 exact billing with zero delivery charge and zero GST tax.',
+        shortDescription: 'Testing Product - Exact ₹1 Billing (No delivery fee, No GST)',
+        category: catMap.get('sarees') || categories[0]._id,
+        brand: brandMap.get('effidoo-heritage'),
+        images: [
+          {
+            url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
+            alt: 'Testing Product',
+            isMain: true,
+          },
+        ],
+        price: 1,
+        compareAtPrice: 99,
+        costPrice: 0,
+        sku: 'TEST-1RS',
+        stock: 999,
+        variants: [],
+        tags: ['test', 'razorpay', '1rs'],
+        featured: true,
+        bestSeller: false,
+        newArrival: false,
+        rating: 5.0,
+        reviewCount: 1,
         isActive: true,
       },
     ];

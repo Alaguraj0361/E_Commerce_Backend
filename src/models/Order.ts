@@ -17,6 +17,19 @@ export interface IOrderTimeline {
   note?: string;
 }
 
+export interface IOrderRefund {
+  refundId: string;
+  paymentId: string;
+  amount: number; // in rupees
+  currency: string;
+  status: 'Pending' | 'Processed' | 'Failed';
+  reason?: string;
+  errorCode?: string;
+  errorDescription?: string;
+  createdAt: Date;
+  processedAt?: Date;
+}
+
 export interface IOrder extends Document {
   _id: mongoose.Types.ObjectId;
   orderNumber: string;
@@ -49,13 +62,26 @@ export interface IOrder extends Document {
   tax: number;
   total: number;
   paymentMethod: string;
-  paymentStatus: 'Pending' | 'Paid' | 'Failed' | 'Refunded' | 'Partially Refunded';
+  paymentStatus: 'Pending' | 'Authorized' | 'Paid' | 'Failed' | 'Refunded' | 'Partially Refunded';
   orderStatus: 'Pending' | 'Confirmed' | 'Processing' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Refunded';
+  totalRefunded?: number;
+  refunds: IOrderRefund[];
   stripePaymentIntentId?: string;
   stripeSessionId?: string;
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
   razorpaySignature?: string;
+  razorpayPaymentStatus?: 'authorized' | 'captured' | 'failed' | 'refunded';
+  razorpayPaymentMethod?: string;
+  razorpayPaymentDetails?: {
+    bank?: string;
+    wallet?: string;
+    vpa?: string;
+    cardNetwork?: string;
+    cardLast4?: string;
+    errorCode?: string;
+    errorDescription?: string;
+  };
   trackingNumber?: string;
   notes?: string;
   timeline: IOrderTimeline[];
@@ -135,7 +161,7 @@ const OrderSchema = new Schema<IOrder>(
     paymentMethod: { type: String, default: 'stripe' },
     paymentStatus: {
       type: String,
-      enum: ['Pending', 'Paid', 'Failed', 'Refunded', 'Partially Refunded'],
+      enum: ['Pending', 'Authorized', 'Paid', 'Failed', 'Refunded', 'Partially Refunded'],
       default: 'Pending',
       index: true,
     },
@@ -145,11 +171,44 @@ const OrderSchema = new Schema<IOrder>(
       default: 'Pending',
       index: true,
     },
+    totalRefunded: { type: Number, default: 0, min: 0 },
+    refunds: [
+      {
+        refundId: { type: String, required: true },
+        paymentId: { type: String, required: true },
+        amount: { type: Number, required: true, min: 0 },
+        currency: { type: String, default: 'INR' },
+        status: {
+          type: String,
+          enum: ['Pending', 'Processed', 'Failed'],
+          default: 'Pending',
+        },
+        reason: { type: String, default: '' },
+        errorCode: { type: String, default: '' },
+        errorDescription: { type: String, default: '' },
+        createdAt: { type: Date, default: Date.now },
+        processedAt: { type: Date },
+      },
+    ],
     stripePaymentIntentId: { type: String, index: true },
     stripeSessionId: { type: String, index: true },
     razorpayOrderId: { type: String, index: true },
     razorpayPaymentId: { type: String, index: true },
     razorpaySignature: { type: String },
+    razorpayPaymentStatus: {
+      type: String,
+      enum: ['authorized', 'captured', 'failed', 'refunded'],
+    },
+    razorpayPaymentMethod: { type: String },
+    razorpayPaymentDetails: {
+      bank: { type: String },
+      wallet: { type: String },
+      vpa: { type: String },
+      cardNetwork: { type: String },
+      cardLast4: { type: String },
+      errorCode: { type: String },
+      errorDescription: { type: String },
+    },
     trackingNumber: { type: String, default: '' },
     notes: { type: String, default: '' },
     timeline: [TimelineSchema],

@@ -54,7 +54,9 @@ app.use(
       const cleanOrigin = origin.replace(/\/$/, '');
       if (
         allowedOrigins.includes(cleanOrigin) ||
-        cleanOrigin.endsWith('.vercel.app')
+        cleanOrigin.endsWith('.vercel.app') ||
+        cleanOrigin.endsWith('nalmarafashion.com') ||
+        cleanOrigin.endsWith('.onrender.com')
       ) {
         return callback(null, true);
       }
@@ -81,7 +83,7 @@ app.post(
 // 2. Razorpay Webhook: Receives raw buffer for HMAC SHA256 signature verification
 app.post(
   '/api/payments/razorpay/webhook',
-  express.raw({ type: 'application/json' }),
+  express.raw({ type: '*/*' }),
   handleRazorpayWebhook
 );
 

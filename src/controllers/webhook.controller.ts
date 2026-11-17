@@ -7,6 +7,10 @@ import { Product } from '../models/Product.js';
 import { Cart } from '../models/Cart.js';
 import { Coupon } from '../models/Coupon.js';
 import { decrementInventoryAtomic } from '../utils/inventory.js';
+import {
+  processRazorpayWebhook,
+  WebhookSignatureError,
+} from '../services/razorpayWebhook.service.js';
 
 export const handleStripeWebhook = async (req: Request, res: Response): Promise<void> => {
   const sig = req.headers['stripe-signature'];
@@ -127,104 +131,19 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
 };
 
 export const handleRazorpayWebhook = async (req: Request, res: Response): Promise<void> => {
-  const signature = req.headers['x-razorpay-signature'] as string;
+  const signature = req.headers['x-razorpay-signature'] as string | undefined;
+  const eventIdHeader = req.headers['x-razorpay-event-id'] as string | undefined;
 
   try {
-    const rawPayload = Buffer.isBuffer(req.body)
-      ? req.body.toString('utf8')
-      : typeof req.body === 'string'
-      ? req.body
-      : JSON.stringify(req.body);
-
-    // Verify webhook signature if secret configured
-    if (ENV.RAZORPAY_WEBHOOK_SECRET && !ENV.RAZORPAY_WEBHOOK_SECRET.includes('placeholder')) {
-      const crypto = await import('crypto');
-      const expectedSignature = crypto
-        .createHmac('sha256', ENV.RAZORPAY_WEBHOOK_SECRET)
-        .update(rawPayload)
-        .digest('hex');
-
-      if (expectedSignature !== signature) {
-        console.warn('[Razorpay Webhook Warning] Webhook signature verification failed');
-        res.status(400).json({ error: 'Invalid webhook signature' });
-        return;
-      }
-    }
-
-    const event = typeof req.body === 'object' && !Buffer.isBuffer(req.body)
-      ? req.body
-      : JSON.parse(rawPayload);
-
-    console.log(`[Razorpay Webhook] Received event: ${event.event}`);
-
-    const payment = event.payload?.payment?.entity;
-    const orderEntity = event.payload?.order?.entity;
-    const razorpayOrderId = payment?.order_id || orderEntity?.id;
-    const razorpayPaymentId = payment?.id;
-
-    if (razorpayOrderId) {
-      const order = await Order.findOne({ razorpayOrderId });
-
-      if (order) {
-        if (event.event === 'payment.captured' || event.event === 'order.paid') {
-          if (order.paymentStatus !== 'Paid') {
-            order.paymentStatus = 'Paid';
-            order.orderStatus = 'Confirmed';
-            order.razorpayPaymentId = razorpayPaymentId || order.razorpayPaymentId;
-            order.timeline.push({
-              status: 'Confirmed',
-              timestamp: new Date(),
-              note: `Payment verified via Razorpay Webhook (${event.event})`,
-            });
-            await order.save();
-
-            // Atomically decrement inventory stock
-            await decrementInventoryAtomic(order.items);
-
-            // Clear cart
-            if (order.user) {
-              await Cart.findOneAndUpdate({ user: order.user }, { items: [] });
-            }
-            console.log(`[Razorpay Webhook] Order ${order.orderNumber} successfully confirmed`);
-          }
-        } else if (event.event === 'payment.failed') {
-          if (order.paymentStatus !== 'Paid') {
-            order.paymentStatus = 'Failed';
-            order.timeline.push({
-              status: 'Payment Failed',
-              timestamp: new Date(),
-              note: payment?.error_description || 'Payment failed on Razorpay gateway',
-            });
-            await order.save();
-            console.warn(`[Razorpay Webhook] Order ${order.orderNumber} payment marked failed`);
-          }
-        }
-      }
-    }
-
-    // Handle refund events
-    if (event.event === 'refund.processed') {
-      const refundEntity = event.payload?.refund?.entity;
-      const paymentId = refundEntity?.payment_id;
-      if (paymentId) {
-        const order = await Order.findOne({ razorpayPaymentId: paymentId });
-        if (order) {
-          order.paymentStatus = 'Refunded';
-          order.orderStatus = 'Refunded';
-          order.timeline.push({
-            status: 'Refunded',
-            timestamp: new Date(),
-            note: `Refund of ₹${((refundEntity.amount || 0) / 100).toFixed(2)} processed via Razorpay (${refundEntity.id})`,
-          });
-          await order.save();
-          console.log(`[Razorpay Webhook] Order ${order.orderNumber} marked as Refunded`);
-        }
-      }
-    }
-
-    res.status(200).json({ status: 'ok' });
+    const result = await processRazorpayWebhook(req.body, signature, eventIdHeader);
+    res.status(200).json(result);
   } catch (error: any) {
-    console.error('[Razorpay Webhook Processing Error]:', error);
+    if (error instanceof WebhookSignatureError) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+
+    console.error('[Razorpay Webhook Error]:', error?.message || error);
     res.status(500).json({ error: 'Webhook processing failed' });
   }
 };
