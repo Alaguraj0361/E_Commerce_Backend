@@ -41,16 +41,7 @@ const seedData = async () => {
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     });
 
-    const customer = await User.create({
-      firstName: 'Priya',
-      lastName: 'Sundaram',
-      email: 'customer@ecommerce.com',
-      phone: '+91 99525 37388',
-      password: 'Password@123',
-      role: 'customer',
-      isEmailVerified: true,
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-    });
+ 
 
     // 2. Create the Featured Categories matching NALMARA FASHION Design
     console.log('[Seed] Creating categories...');
@@ -703,13 +694,13 @@ const seedData = async () => {
       user: customer._id,
       items: order1Items,
       shippingAddress: {
-        fullName: 'Preethi Sundaram',
-        phone: '+91 99525 37388',
-        addressLine1: 'No. 42, Anna Nagar 2nd Avenue',
+        fullName: 'Alagu Raj',
+        phone: '+91 7871207631',
+        addressLine1: '123 Main Street',
         addressLine2: 'Near Roundtana',
-        city: 'Chennai',
+        city: 'Thoothukudi',
         state: 'Tamil Nadu',
-        postalCode: '600040',
+        postalCode: '628304',
         country: 'India',
       },
       subtotal: order1Subtotal,
