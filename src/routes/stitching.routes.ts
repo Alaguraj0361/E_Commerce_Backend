@@ -12,10 +12,15 @@ import {
   createStitchingOrder,
   updateStitchingOrder,
   deleteStitchingOrder,
+  bookStitchingService,
 } from '../controllers/stitching.controller.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 
 const router = Router();
+
+// Public Customer Booking Routes
+router.post('/book', bookStitchingService);
+router.post('/public-booking', bookStitchingService);
 
 // Category Routes
 router.get('/categories', getStitchingCategories);
