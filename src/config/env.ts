@@ -27,11 +27,11 @@ export const ENV = {
   RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || 'rzp_test_placeholder_secret',
   RAZORPAY_WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET || '',
   
-  SMTP_HOST: process.env.SMTP_HOST || 'smtp.mailtrap.io',
-  SMTP_PORT: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 2525,
-  SMTP_USER: process.env.SMTP_USER || '',
+  SMTP_HOST: process.env.SMTP_HOST || 'smtp.gmail.com',
+  SMTP_PORT: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 465,
+  SMTP_USER: process.env.SMTP_USER || 'nalmarafashion@gmail.com',
   SMTP_PASSWORD: process.env.SMTP_PASSWORD || '',
-  EMAIL_FROM: process.env.EMAIL_FROM || 'no-reply@ecommerce-store.com',
+  EMAIL_FROM: process.env.EMAIL_FROM || 'nalmarafashion@gmail.com',
   
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
 };

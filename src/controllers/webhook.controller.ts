@@ -7,6 +7,7 @@ import { Product } from '../models/Product.js';
 import { Cart } from '../models/Cart.js';
 import { Coupon } from '../models/Coupon.js';
 import { decrementInventoryAtomic } from '../utils/inventory.js';
+import { sendOrderPlacedEmail } from '../services/mail.service.js';
 import {
   processRazorpayWebhook,
   WebhookSignatureError,
@@ -75,6 +76,12 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
                 }
               );
             }
+
+            // Send royal order placed confirmation email
+            sendOrderPlacedEmail(order).catch((err: any) => {
+              console.error(`[Stripe Webhook Error] Failed to send order email for ${order.orderNumber}:`, err.message);
+            });
+
             console.log(`[Order Confirmed] Order ${order.orderNumber} fulfilled`);
           }
         }

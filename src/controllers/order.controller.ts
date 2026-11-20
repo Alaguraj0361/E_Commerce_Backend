@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { Order } from '../models/Order.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
+import { sendOrderStatusUpdateEmail } from '../services/mail.service.js';
 
 export const getUserOrders = async (
   req: AuthenticatedRequest,
@@ -156,7 +157,7 @@ export const updateOrderStatus = async (
     const { id } = req.params;
     const { orderStatus, trackingNumber, note } = req.body;
 
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).populate('user', 'firstName lastName email');
     if (!order) {
       sendError(res, 'Order not found', 404);
       return;
@@ -174,6 +175,17 @@ export const updateOrderStatus = async (
     });
 
     await order.save();
+
+    // Send royal order status update email
+    sendOrderStatusUpdateEmail(
+      order,
+      orderStatus,
+      note,
+      trackingNumber !== undefined ? trackingNumber : order.trackingNumber
+    ).catch((err) => {
+      console.error('[Email Error] Failed to send order status update email:', err);
+    });
+
     sendSuccess(res, 'Order status updated successfully', order);
   } catch (error) {
     next(error);

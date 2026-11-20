@@ -24,7 +24,7 @@ export const sendEmail = async (options: {
       return;
     }
     await transporter.sendMail({
-      from: `"${ENV.EMAIL_FROM}" <${ENV.EMAIL_FROM}>`,
+      from: `"NALMARA FASHION" <${ENV.EMAIL_FROM || ENV.SMTP_USER}>`,
       to: options.to,
       subject: options.subject,
       text: options.text,

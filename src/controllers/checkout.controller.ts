@@ -10,6 +10,7 @@ import { AuthenticatedRequest } from '../middleware/auth.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 import { ENV } from '../config/env.js';
 import { decrementInventoryAtomic, rollbackInventory } from '../utils/inventory.js';
+import { sendOrderPlacedEmail } from '../services/mail.service.js';
 
 export const calculateOrderTotals = async (
   items: Array<{ productId: string; variantId?: string; quantity: number }>,
@@ -258,6 +259,11 @@ export const createCheckoutSession = async (
       // Clear user's cart
       await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
 
+      // Send Order Placed confirmation email
+      sendOrderPlacedEmail(order, req.user.email).catch((err) => {
+        console.error('[Email Error] Failed to send order placed email for mock order:', err);
+      });
+
       sendSuccess(res, 'Order created in test mode', {
         sessionId: 'mock_session_test',
         url: `${ENV.FRONTEND_URL}/checkout/success?order_id=${order._id}`,
@@ -502,6 +508,11 @@ export const verifyRazorpayPayment = async (
           }
         );
       }
+
+      // Send Order Placed confirmation email
+      sendOrderPlacedEmail(updatedOrder, req.user?.email).catch((err) => {
+        console.error('[Email Error] Failed to send order confirmation email for verified Razorpay order:', err);
+      });
     }
 
     sendSuccess(res, 'Payment verified successfully', {
@@ -588,6 +599,11 @@ export const createCodOrder = async (
 
     // Clear cart
     await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+
+    // Send Order Placed confirmation email
+    sendOrderPlacedEmail(order, req.user.email).catch((err) => {
+      console.error('[Email Error] Failed to send order placed email for COD order:', err);
+    });
 
     sendSuccess(res, 'COD Order placed successfully', {
       orderId: order._id,

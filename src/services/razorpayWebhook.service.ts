@@ -5,6 +5,7 @@ import { Cart } from '../models/Cart.js';
 import { Coupon } from '../models/Coupon.js';
 import { ProcessedWebhookEvent } from '../models/ProcessedWebhookEvent.js';
 import { decrementInventoryAtomic } from '../utils/inventory.js';
+import { sendOrderPlacedEmail } from './mail.service.js';
 
 export class WebhookSignatureError extends Error {
   constructor(message = 'Invalid webhook signature') {
@@ -197,6 +198,11 @@ async function fulfillOrderOnce(
       console.warn(`[Razorpay Webhook Warning] Could not record coupon ${updatedOrder.couponCode}:`, couponErr.message);
     }
   }
+
+  // 4. Send Order Placed confirmation email
+  sendOrderPlacedEmail(updatedOrder).catch((mailErr: any) => {
+    console.error(`[Razorpay Webhook Error] Failed to send order email for ${updatedOrder.orderNumber}:`, mailErr.message);
+  });
 
   console.log(`[Razorpay Webhook] Successfully fulfilled order ${updatedOrder.orderNumber} via ${sourceEvent}`);
   return true;

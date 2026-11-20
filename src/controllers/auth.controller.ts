@@ -9,6 +9,11 @@ import {
 } from '../utils/jwt.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 import { sendEmail } from '../config/mail.js';
+import {
+  sendWelcomeEmail,
+  sendPasswordChangedEmail,
+  sendPasswordResetEmail,
+} from '../services/mail.service.js';
 import { ENV } from '../config/env.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 
@@ -45,6 +50,11 @@ export const register = async (
     const refreshToken = generateRefreshToken(tokenPayload);
 
     setAuthCookies(res, accessToken, refreshToken);
+
+    // Send Welcome Email asynchronously
+    sendWelcomeEmail(user).catch((err) => {
+      console.error('[Email Error] Failed to send welcome email:', err);
+    });
 
     sendSuccess(
       res,
@@ -98,6 +108,11 @@ export const login = async (
     const refreshToken = generateRefreshToken(tokenPayload);
 
     setAuthCookies(res, accessToken, refreshToken);
+
+    // Send Welcome Email asynchronously
+    sendWelcomeEmail(user).catch((err) => {
+      console.error('[Email Error] Failed to send welcome email:', err);
+    });
 
     sendSuccess(res, 'Login successful. Welcome back!', {
       user: {
@@ -172,22 +187,9 @@ export const forgotPassword = async (
 
     const resetUrl = `${ENV.FRONTEND_URL}/reset-password/${resetToken}`;
 
-    await sendEmail({
-      to: user.email,
-      subject: 'Password Reset Request',
-      text: `You requested a password reset. Please click on the link to reset your password: ${resetUrl}\n\nThis link will expire in 1 hour.`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Password Reset Request</h2>
-          <p>Hi ${user.firstName},</p>
-          <p>You requested a password reset for your account. Click the button below to reset your password:</p>
-          <p style="margin: 24px 0;">
-            <a href="${resetUrl}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Reset Password</a>
-          </p>
-          <p>Or copy this link: <a href="${resetUrl}">${resetUrl}</a></p>
-          <p>This link will expire in 1 hour. If you didn't request this, you can safely ignore this email.</p>
-        </div>
-      `,
+    // Send Royal Password Reset Email
+    sendPasswordResetEmail(user, resetUrl).catch((err) => {
+      console.error('[Email Error] Failed to send password reset email:', err);
     });
 
     sendSuccess(res, 'If an account exists with that email, a password reset link has been sent.');
@@ -222,6 +224,11 @@ export const resetPassword = async (
     user.resetPasswordExpires = undefined;
     await user.save();
 
+    // Send Password Changed confirmation & security alert email
+    sendPasswordChangedEmail(user).catch((err) => {
+      console.error('[Email Error] Failed to send password changed notification email:', err);
+    });
+
     sendSuccess(res, 'Password has been reset successfully. You can now log in with your new password.');
   } catch (error) {
     next(error);
@@ -250,6 +257,11 @@ export const changePassword = async (
 
     user.password = newPassword;
     await user.save();
+
+    // Send Password Changed confirmation & security alert email
+    sendPasswordChangedEmail(user).catch((err) => {
+      console.error('[Email Error] Failed to send password changed notification email:', err);
+    });
 
     sendSuccess(res, 'Password changed successfully');
   } catch (error) {
