@@ -35,13 +35,22 @@ const seedData = async () => {
       lastName: 'Admin',
       email: 'admin@ecommerce.com',
       phone: '+91 78712 07631',
-      password: ' ',
+      password: 'admin',
       role: 'admin',
       isEmailVerified: true,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     });
 
- 
+    const customer = await User.create({
+      firstName: 'Alagu',
+      lastName: 'Raj',
+      email: 'customer@ecommerce.com',
+      phone: '+91 78712 07631',
+      password: 'password123',
+      role: 'customer',
+      isEmailVerified: true,
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    });
 
     // 2. Create the Featured Categories matching NALMARA FASHION Design
     console.log('[Seed] Creating categories...');
